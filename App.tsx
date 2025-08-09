@@ -18,6 +18,8 @@ const VEO3_MODEL_NAME = 'veo-3.0-generate-preview';
 
 const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
 
+import { startJob, pollUntilDone } from "./source/api";
+
 // ---
 
 function bloblToBase64(blob: Blob) {
@@ -87,6 +89,36 @@ export const App: React.FC = () => {
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [generationError, setGenerationError] = useState<string[] | null>(null);
+
+  // -- Runpod quick generate (add-on) --
+  const [rpPrompt, setRpPrompt] = useState(
+    "A neon cyberpunk CAT bartender, close-up, shallow depth of field, bokeh"
+  );
+  const [rpSeconds, setRpSeconds] = useState(6);   // optional controls, keep simple
+  const [rpSteps, setRpSteps] = useState(30);
+  const [rpStatus, setRpStatus] = useState("");
+  const [rpLoading, setRpLoading] = useState(false);
+  const [rpUrl, setRpUrl] = useState("");
+
+  async function handleRunpodGenerate() {
+    try {
+      setRpLoading(true);
+      setRpUrl("");
+      setRpStatus("Starting…");
+  
+      const jobId = await startJob({ prompt: rpPrompt, seconds: rpSeconds, steps: rpSteps });
+      setRpStatus(`Job ${jobId.slice(0, 8)} running…`);
+  
+      const url = await pollUntilDone(jobId, 3000);
+      console.log("final url", url);        // should log https://.../files/.../result.mp4
+      setRpUrl(url);                        // <— this drives the <video>
+      setRpStatus("Done ✅");
+    } catch (e: any) {
+      setRpStatus(`Error: ${e?.message || String(e)}`);
+    } finally {
+      setRpLoading(false);
+    }
+  }
 
   const handlePlayVideo = (video: Video) => {
     setPlayingVideo(video);
@@ -169,6 +201,73 @@ export const App: React.FC = () => {
             </p>
           </header>
           <main className="px-4 md:px-8 pb-8">
+            {/* --- New: quick Runpod generation card --- */}
+            <section className="mb-8 rounded-lg border border-gray-700 bg-gray-800 p-4">
+              <h2 className="text-lg font-semibold mb-3">Quick Generate (VC2 on Runpod)</h2>
+
+              <div className="grid gap-3">
+                <textarea
+                  rows={3}
+                  className="w-full rounded border border-gray-600 bg-gray-900 p-2"
+                  value={rpPrompt}
+                  onChange={(e) => setRpPrompt(e.target.value)}
+                />
+
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    Seconds
+                    <input
+                      type="number"
+                      min={1}
+                      max={10}
+                      className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                      value={rpSeconds}
+                      onChange={(e) => setRpSeconds(parseInt(e.target.value || "1"))}
+                    />
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    Steps
+                    <input
+                      type="number"
+                      min={10}
+                      max={60}
+                      className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                      value={rpSteps}
+                      onChange={(e) => setRpSteps(parseInt(e.target.value || "10"))}
+                    />
+                  </label>
+
+                  <button
+                    onClick={handleRunpodGenerate}
+                    disabled={rpLoading}
+                    className="ml-auto rounded bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white disabled:opacity-60"
+                  >
+                    {rpLoading ? "Generating…" : "Generate"}
+                  </button>
+                </div>
+
+                <p className="text-sm text-gray-400">{rpStatus}</p>
+
+                {rpUrl && (
+                  <div className="mt-2">
+                    <video
+                      src={rpUrl}
+                      controls
+                      playsInline
+                      muted
+                      className="max-w-full max-h-[70vh] rounded border border-gray-700"
+                    />
+                    <div className="mt-2 text-sm">
+                      <a href={rpUrl} download className="underline">
+                        ⬇️ Download MP4
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* your existing gallery */}
             <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
           </main>
         </div>
