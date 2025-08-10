@@ -51,8 +51,8 @@ export const MOCK_VIDEOS: Video[] = [
   {
     id: '7',
     title: 'Shrek Dancing Video Generated',
-    videoUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-    description: `A demo video featuring animated content. This video serves as an example of AI-generated content and showcases the capabilities of the video generation system. Perfect for testing the gallery functionality and demonstrating the type of content that can be created and shared through the platform.`,
+    videoUrl: 'https://storage.googleapis.com/veo-3-gallery-hack-mit-468523/videos/832dca4c-55ea-4457-a19f-81a721e80acd.mp4',
+    description: `A demo video featuring the beloved ogre Shrek in an entertaining dance sequence. This video serves as an example of AI-generated content and showcases the capabilities of the video generation system. Perfect for testing the gallery functionality and demonstrating the type of content that can be created and shared through the platform.`,
   },
   {
     id: '8',
