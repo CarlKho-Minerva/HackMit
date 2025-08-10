@@ -1,53 +1,102 @@
 # Architecture Overview
 
-System design and architecture for Veo-3 Gallery.
+System design and architecture for Viral-Veo with integrated Remotion video editor and Apple Music integration.
 
 ## High-Level Architecture
 
 ```
-Frontend (React/Vite)  ←→  Backend (Express.js)  ←→  Google Cloud Services
+Frontend (React/Vite)  ←→  Backend (Express.js)  ←→  External Services
      ↓                           ↓                           ↓
-- Video Gallery UI           - File Upload API          - Cloud Storage
-- Drag & Drop Upload        - YouTube Publishing         - YouTube Data API
-- Progress Tracking         - Token Management           - OAuth 2.0
+- Video Gallery UI           - File Upload API          - Google Cloud Storage
+- Remotion Video Editor      - YouTube Publishing         - YouTube Data API v3
+- Apple Music Integration    - Trending Sounds API        - iTunes/Deezer APIs
+- Progress Tracking          - Token Management           - OAuth 2.0
+- Professional Publishing    - Remotion Rendering         - Veo-3 AI Model
 ```
 
 ## Technology Stack
 
-### Frontend
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Styling
-- **React Dropzone** - File upload interface
+### Frontend Architecture
+- **React 19** - Modern UI framework with concurrent features
+- **TypeScript** - Type safety and enhanced developer experience
+- **Vite** - Fast build tool with HMR for development
+- **Tailwind CSS** - Utility-first styling with custom black/white theme
+- **Remotion Player** - Real-time video preview and editing
+- **React Dropzone** - File upload interface with drag & drop
 
-### Backend
-- **Express.js** - Web framework
-- **TypeScript** - Type safety
-- **Multer** - File upload handling
-- **Google Cloud Storage** - File storage
-- **YouTube Data API v3** - Video publishing
-- **Google Auth Library** - OAuth management
+### Backend Architecture
+- **Express.js** - Web framework with comprehensive API routes
+- **TypeScript** - Full-stack type safety
+- **Multer** - Multipart file upload handling
+- **Google Cloud Storage** - Scalable video file storage
+- **YouTube Data API v3** - Video publishing and metadata management
+- **Google Auth Library** - OAuth 2.0 authentication flows
+- **Remotion Renderer** - Server-side video processing
 
-### Infrastructure
-- **Google Cloud Platform** - Cloud services
-- **Google Cloud Storage** - Video file storage
-- **YouTube Data API** - Video publishing
-- **OAuth 2.0** - Authentication
+### Video Processing Pipeline
+- **Remotion Engine** - Professional video composition and rendering
+- **FFmpeg** - Video encoding and format conversion
+- **Caption System** - Precision-timed subtitle overlays
+- **Aspect Ratio Engine** - Dynamic video format conversion (16:9, 9:16, 1:1)
+- **Audio Integration** - Apple Music trending sounds merging
+
+### External Integrations
+- **Google Cloud Platform** - Infrastructure and storage
+- **YouTube Data API** - Video publishing platform
+- **Apple Music APIs** - iTunes and Deezer for trending sounds
+- **Google Veo-3** - AI video generation model
+- **OAuth 2.0** - Secure authentication flows
 
 ## Data Flow
 
-### Video Upload Pipeline
-1. User drops video file in UI
-2. Frontend sends file to `/api/upload-to-gcs`
-3. Backend uploads to Google Cloud Storage
-4. Returns public GCS URL to frontend
-5. UI displays upload success with GCS URL
+### Video Generation & Editing Pipeline
+
+1. **Video Generation**
+   - User inputs prompt for AI video generation
+   - System generates video using Veo-3 or VideoCrafter
+   - Generated video stored in temporary location
+
+2. **Professional Editing Phase**
+   - Video automatically opens in Remotion Editor
+   - User adds captions with precise timing controls
+   - User selects aspect ratio (16:9, 9:16, 1:1)
+   - User browses and selects trending music from Apple Music APIs
+   - Real-time preview with all edits applied
+
+3. **Publishing Pipeline**
+   - User clicks export to open YouTube publishing modal
+   - Professional form with title, description, tags, privacy settings
+   - Video renders with all edits applied (captions, aspect ratio, audio)
+   - Automatic upload to YouTube with metadata
+   - User remains in editor for continued editing
+
+### Apple Music Integration Pipeline
+
+1. **API Data Fetching**
+   - Frontend calls `/api/trending-sounds` with provider parameter
+   - Backend fetches from iTunes API for trending sounds
+   - Backend fetches from Deezer API for popular sounds
+   - Real-time search and filtering in UI
+
+2. **Audio Integration**
+   - User selects song from trending/popular lists
+   - Audio merging API processes video + selected audio
+   - Preview available in Remotion editor
+   - Final export includes synchronized audio
 
 ### YouTube Publishing Pipeline
-1. User clicks "Publish to YouTube"
-2. Frontend sends GCS URL to `/api/publish-to-youtube`
-3. Backend downloads video from GCS
+
+1. **Enhanced Publishing Modal**
+   - User clicks "Publish to YouTube" in export menu
+   - Professional modal opens with pre-filled metadata
+   - User customizes title, description, tags, privacy, category
+   - Optional thumbnail upload support
+
+2. **Publishing Process**
+   - OAuth 2.0 authentication flow (auto-refresh tokens)
+   - Video upload with comprehensive metadata
+   - Success feedback without leaving editor
+   - Continued editing workflow maintained
 4. Authenticates with YouTube API using OAuth
 5. Uploads video to YouTube channel
 6. Returns YouTube URL to frontend
