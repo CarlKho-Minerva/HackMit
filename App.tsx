@@ -2,15 +2,16 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import React, { useState } from "react";
-import { EditVideoPage } from "./components/EditVideoPage";
-import { ErrorModal } from "./components/ErrorModal";
-import { VideoCameraIcon } from "./components/icons";
-import { SavingProgressPage } from "./components/SavingProgressPage";
-import { VideoGrid } from "./components/VideoGrid";
-import { VideoPlayer } from "./components/VideoPlayer";
-import { MOCK_VIDEOS } from "./constants";
-import { Video } from "./types";
+import React, {useState} from 'react';
+import {EditVideoPage} from './components/EditVideoPage';
+import {ErrorModal} from './components/ErrorModal';
+import {VideoCameraIcon} from './components/icons';
+import {SavingProgressPage} from './components/SavingProgressPage';
+import {VideoGrid} from './components/VideoGrid';
+import {VideoPlayer} from './components/VideoPlayer';
+import {VideoUploader} from './components/VideoUploader';
+import {MOCK_VIDEOS} from './constants';
+import {Video} from './types';
 
 import { GeneratedVideo, GoogleGenAI } from "@google/genai";
 
@@ -87,6 +88,7 @@ export const App: React.FC = () => {
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [generationError, setGenerationError] = useState<string[] | null>(null);
+  const [currentView, setCurrentView] = useState<'gallery' | 'uploader'>('gallery');
 
   // -- Runpod quick generate (add-on) --
   const [rpPrompt, setRpPrompt] = useState(
@@ -201,98 +203,136 @@ export const App: React.FC = () => {
               <span>Veo Gallery</span>
             </h1>
             <p className="text-gray-400 mt-2 text-lg">
-              Select a video to generate your own variations
+              {currentView === 'gallery'
+                ? 'Select a video to generate your own variations'
+                : 'Upload and publish videos to YouTube'}
             </p>
+
+            {/* Navigation */}
+            <div className="mt-6 flex justify-center space-x-4">
+              <button
+                onClick={() => setCurrentView('gallery')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  currentView === 'gallery'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Gallery
+              </button>
+              <button
+                onClick={() => setCurrentView('uploader')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  currentView === 'uploader'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Upload & Publish
+              </button>
+            </div>
           </header>
+
           <main className="px-4 md:px-8 pb-8">
-            {/* --- Quick Runpod generation card --- */}
-            <section className="mb-8 rounded-lg border border-gray-700 bg-gray-800 p-4">
-              <h2 className="text-lg font-semibold mb-3">
-                Quick Generate (VC2 on Runpod)
-              </h2>
+            {currentView === 'gallery' ? (
+              <>
+                {/* --- Quick Runpod generation card --- */}
+                <section className="mb-8 rounded-lg border border-gray-700 bg-gray-800 p-4">
+                  <h2 className="text-lg font-semibold mb-3">
+                    Quick Generate (VC2 on Runpod)
+                  </h2>
 
-              <div className="grid gap-3">
-                <textarea
-                  rows={3}
-                  className="w-full rounded border border-gray-600 bg-gray-900 p-2"
-                  value={rpPrompt}
-                  onChange={(e) => setRpPrompt(e.target.value)}
-                />
-
-                <div className="flex flex-wrap items-center gap-4">
-                  <label className="flex items-center gap-2 text-sm">
-                    Seconds
-                    <input
-                      type="number"
-                      min={1}
-                      max={10}
-                      className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
-                      value={rpSeconds}
-                      onChange={(e) =>
-                        setRpSeconds(parseInt(e.target.value || "1"))
-                      }
+                  <div className="grid gap-3">
+                    <textarea
+                      rows={3}
+                      className="w-full rounded border border-gray-600 bg-gray-900 p-2"
+                      value={rpPrompt}
+                      onChange={(e) => setRpPrompt(e.target.value)}
                     />
-                  </label>
 
-                  <label className="flex items-center gap-2 text-sm">
-                    Steps
-                    <input
-                      type="number"
-                      min={10}
-                      max={60}
-                      className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
-                      value={rpSteps}
-                      onChange={(e) =>
-                        setRpSteps(parseInt(e.target.value || "10"))
-                      }
-                    />
-                  </label>
+                    <div className="flex flex-wrap items-center gap-4">
+                      <label className="flex items-center gap-2 text-sm">
+                        Seconds
+                        <input
+                          type="number"
+                          min={1}
+                          max={10}
+                          className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                          value={rpSeconds}
+                          onChange={(e) =>
+                            setRpSeconds(parseInt(e.target.value || "1"))
+                          }
+                        />
+                      </label>
 
-                  <label className="text-sm">
-                    Aspect
-                    <select
-                      className="ml-2 rounded bg-gray-900 border border-gray-600 p-1"
-                      value={rpAspect}
-                      onChange={(e) => setRpAspect(e.target.value as any)}
-                    >
-                      <option value="16:9">16:9 (landscape)</option>
-                      <option value="1:1">1:1 (square)</option>
-                      <option value="9:16">9:16 (portrait)</option>
-                    </select>
-                  </label>
+                      <label className="flex items-center gap-2 text-sm">
+                        Steps
+                        <input
+                          type="number"
+                          min={10}
+                          max={60}
+                          className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                          value={rpSteps}
+                          onChange={(e) =>
+                            setRpSteps(parseInt(e.target.value || "10"))
+                          }
+                        />
+                      </label>
 
-                  <button
-                    onClick={handleRunpodGenerate}
-                    disabled={rpLoading}
-                    className="ml-auto rounded bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white disabled:opacity-60"
-                  >
-                    {rpLoading ? "Generating…" : "Generate"}
-                  </button>
-                </div>
+                      <label className="text-sm">
+                        Aspect
+                        <select
+                          className="ml-2 rounded bg-gray-900 border border-gray-600 p-1"
+                          value={rpAspect}
+                          onChange={(e) => setRpAspect(e.target.value as any)}
+                        >
+                          <option value="16:9">16:9 (landscape)</option>
+                          <option value="1:1">1:1 (square)</option>
+                          <option value="9:16">9:16 (portrait)</option>
+                        </select>
+                      </label>
 
-                <p className="text-sm text-gray-400">{rpStatus}</p>
-
-                {rpUrl && (
-                  <div className="mt-2">
-                    <video
-                      src={rpUrl}
-                      controls
-                      playsInline
-                      muted
-                      className="max-w-full max-h-[70vh] rounded border border-gray-700"
-                    />
-                    <div className="mt-2 text-sm">
-                      <a href={rpUrl} download className="underline">
-                        ⬇️ Download MP4
-                      </a>
+                      <button
+                        onClick={handleRunpodGenerate}
+                        disabled={rpLoading}
+                        className="ml-auto rounded bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white disabled:opacity-60"
+                      >
+                        {rpLoading ? "Generating…" : "Generate"}
+                      </button>
                     </div>
-                  </div>
-                )}
-              </div>
-            </section>
 
-            {/* your existing gallery */}
-            <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
+                    <p className="text-sm text-gray-400">{rpStatus}</p>
+
+                    {rpUrl && (
+                      <div className="mt-2">
+                        <video
+                          src={rpUrl}
+                          controls
+                          playsInline
+                          muted
+                          className="max-w-full max-h-[70vh] rounded border border-gray-700"
+                        />
+                        <div className="mt-2 text-sm">
+                          <a href={rpUrl} download className="underline">
+                            ⬇️ Download MP4
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* your existing gallery */}
+                <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
+              </>
+            ) : (
+              <VideoUploader
+                onVideoPublished={(data) => {
+                  console.log('Video published successfully:', data);
+                  // You could add the published video to your gallery here
+                }}
+              />
+            )}
           </main>
         </div>
       )}
@@ -309,7 +349,7 @@ export const App: React.FC = () => {
         <ErrorModal
           message={generationError}
           onClose={() => setGenerationError(null)}
-          onSelectKey={async () => await window.aistudio?.openSelectKey()}
+          onSelectKey={async () => await (window as any).aistudio?.openSelectKey()}
         />
       )}
     </div>
