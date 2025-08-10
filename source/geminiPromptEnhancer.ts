@@ -68,7 +68,7 @@ Please enhance this prompt following VEO-3 best practices. Respond in this exact
   "improvements": ["Improvement 1", "Improvement 2", "Improvement 3"]
 }
 
-Make the enhanced prompt cinematic, detailed, and optimized for VEO-3's video generation capabilities.`;
+Make the enhanced prompt cinematic, detailed, and optimized for VEO-3's video generation capabilities. Max 8 seconds, be specific with content per second.`;
   }
 
   private parseResponse(text: string): PromptEnhancementResult {
