@@ -17,6 +17,9 @@ const BASE = (import.meta.env.VITE_RUNPOD_BASE as string || "")
   .trim()
   .replace(/\/$/, "");
 
+// Use local proxy in development to avoid CORS issues
+const API_BASE = import.meta.env.DEV ? 'http://localhost:3001/api' : BASE;
+
 if (!BASE) {
   console.warn("VITE_RUNPOD_BASE is missing. Set it in .env.local");
 }
@@ -69,7 +72,7 @@ function sanitize(body: GenerateReq) {
 export async function startJob(body: GenerateReq): Promise<string> {
   const payload = sanitize(body);
 
-  const r = await fetch(`${BASE}/generate`, {
+  const r = await fetch(`${API_BASE}/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -82,7 +85,7 @@ export async function startJob(body: GenerateReq): Promise<string> {
 }
 
 export async function getJob(id: string): Promise<Job> {
-  const r = await fetch(`${BASE}/jobs/${encodeURIComponent(id)}`, {
+  const r = await fetch(`${API_BASE}/jobs/${encodeURIComponent(id)}`, {
     cache: "no-store",
   });
   if (!r.ok) throw new Error(`getJob failed: ${r.status}`);
@@ -97,7 +100,7 @@ export async function pollUntilDone(
   // eslint-disable-next-line no-constant-condition
   while (true) {
     if (signal?.aborted) throw new Error("Cancelled");
-    const r = await fetch(`${BASE}/jobs/${encodeURIComponent(id)}`, {
+    const r = await fetch(`${API_BASE}/jobs/${encodeURIComponent(id)}`, {
       cache: "no-store",
     });
     if (!r.ok) throw new Error(`getJob failed: ${r.status}`);
