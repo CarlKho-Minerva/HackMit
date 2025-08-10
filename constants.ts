@@ -74,3 +74,20 @@ export const MOCK_VIDEOS: Video[] = [
     description: `Fluffy Characters Stop Motion: A bright, whimsical forest clearing where oversized, colorful mushrooms grow. Two adorable, fluffy squirrel-like creatures with big, curious eyes are having a picnic. One, wearing a tiny knitted scarf, attempts to open a jar of "Nutty Spread," making frustrated, soft "grunts" and tiny "panting" sounds. The camera is a mid-shot, then slowly zooms in on the struggling jar. The other, an even fluffier creature with a flower behind its ear, giggles softly, then says in a sweet, high-pitched voice, "Need a paw, Squiggle?" A gentle, melodic flute tune plays throughout.`,
   },
 ];
+
+export const ASPECT_PRESETS = {
+  "16:9": { width: 576, height: 320 },
+  "1:1":  { width: 512, height: 512 },
+  "9:16": { width: 320, height: 576 },
+} as const;
+
+export type AspectKey = keyof typeof ASPECT_PRESETS; // "16:9" | "1:1" | "9:16"
+
+export const DEFAULT_FPS = 12;       // fixed on client
+export const MAX_FRAMES  = 48;       // safety cap
+
+export const ASPECT_OPTIONS = [
+  { label: "16:9 (landscape)", value: "16:9" },
+  { label: "1:1 (square)",     value: "1:1"  },
+  { label: "9:16 (portrait)",  value: "9:16" },
+];     
