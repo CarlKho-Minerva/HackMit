@@ -1,23 +1,19 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server/server.ts",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/server.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "functions": {
-    "server/server.ts": {
+    "api/upload-to-gcs.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/publish-to-youtube.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/generate.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/jobs/[id].ts": {
       "maxDuration": 300,
       "memory": 1024
     }
