@@ -18,10 +18,10 @@ export const VideoCard: React.FC<VideoCardProps> = ({video, onPlay}) => {
   return (
     <button
       type="button"
-      className="group w-full text-left bg-gray-800/50 rounded-lg overflow-hidden shadow-lg hover:shadow-gray-500/30 transform transition-all duration-300 hover:-translate-y-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+      className="group w-full h-full text-left bg-black border border-white/20 overflow-hidden transition-all duration-300 hover:border-white cursor-pointer focus:outline-none focus:border-white flex flex-col"
       onClick={() => onPlay(video)}
       aria-label={`Play video: ${video.title}`}>
-      <div className="relative">
+      <div className="relative overflow-hidden flex-shrink-0">
         <video
           className="w-full h-48 object-cover pointer-events-none"
           src={video.videoUrl}
@@ -29,13 +29,15 @@ export const VideoCard: React.FC<VideoCardProps> = ({video, onPlay}) => {
           playsInline
           preload="metadata"
           aria-hidden="true"></video>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <PlayIcon className="w-16 h-16 text-white opacity-80 drop-shadow-lg group-hover:opacity-100 transform group-hover:scale-110 transition-transform" />
+        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+          <div className="bg-white p-4">
+            <PlayIcon className="w-8 h-8 text-black" />
+          </div>
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-4 border-t border-white/20 flex-grow flex items-start min-h-0">
         <h3
-          className="text-base font-semibold text-gray-200 truncate"
+          className="text-sm font-thin text-white uppercase tracking-wide leading-relaxed line-clamp-3"
           title={video.title}>
           {video.title}
         </h3>

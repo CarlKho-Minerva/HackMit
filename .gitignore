@@ -1,3 +1,4 @@
+Shrek_Dancing_Video_Generated
 GCP_SETUP.md
 .env
 # Logs
@@ -25,3 +26,4 @@ dist-ssr
 *.sln
 *.sw?
 service-account-key.json
+*.mp4
