@@ -104,13 +104,13 @@ export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<'gallery' | 'uploader'>('gallery');
 
   // New fake generation system
-  const [promptText, setPromptText] = useState("A majestic cat dancing in a cyberpunk alleyway");
+  const [promptText, setPromptText] = useState("A 3D animation of Shrek happily dancing in a sunny forest and then waving at the camera.");
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentJob, setCurrentJob] = useState<FakeGenerationJob | null>(null);
 
   // -- Runpod quick generate (add-on) --
   const [rpPrompt, setRpPrompt] = useState(
-    "A neon cyberpunk CAT bartender, close-up, shallow depth of field, bokeh"
+    "A 3D animation of Shrek happily dancing in a sunny forest and then waving at the camera."
   );
   const [rpSeconds, setRpSeconds] = useState(6);
   const [rpSteps, setRpSteps] = useState(14);

@@ -9,7 +9,7 @@ async function testFakeGeneration() {
   console.log('🎬 Testing Fake Video Generation System');
   console.log('=====================================');
 
-  const testPrompt = "A majestic cat dancing in a cyberpunk alleyway";
+  const testPrompt = "A 3D animation of Shrek happily dancing in a sunny forest and then waving at the camera.";
   console.log(`📝 Test prompt: "${testPrompt}"`);
 
   // Start fake generation
