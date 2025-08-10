@@ -25,7 +25,7 @@ export const publishToYouTube = async (req: PublishRequest, res: Response) => {
     const oauth2Client = new google.auth.OAuth2(
       process.env.YOUTUBE_CLIENT_ID,
       process.env.YOUTUBE_CLIENT_SECRET,
-      'http://localhost:3001/auth/youtube/callback'
+      process.env.YOUTUBE_REDIRECT_URI || 'http://localhost:3001/auth/youtube/callback'
     );
 
     // Set the credentials with automatic refresh
