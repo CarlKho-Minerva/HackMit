@@ -258,25 +258,18 @@ export const RemotionVideoEditor: React.FC<RemotionVideoEditorProps> = ({
 
         const youtubeData = {
           videoUrl: video.videoUrl,
-          title: `🎬 ${video.title} | Professional AI Video Edit (${aspectRatio})`,
-          description: `🚀 AI-POWERED VIDEO EDITING SHOWCASE
-          
-📽️ Original Video: ${video.title}
-🎯 Optimized for: ${aspectRatio === '9:16' ? 'TikTok/Instagram Stories' : aspectRatio === '1:1' ? 'Instagram Posts' : 'YouTube/Desktop'}
-⏱️ Duration: ${Math.floor(videoDuration)} seconds
-📝 Professional Captions: ${captions.length} precisely timed subtitles
+          title: `HackMIT Demo - AI Video ${new Date().toISOString().slice(0, 10)}`,
+          description: `🎬 Professional AI-Generated Video
 
-✨ EDITING FEATURES APPLIED:
-• Smart caption timing and positioning
-• Optimized aspect ratio for ${aspectRatio === '9:16' ? 'mobile vertical viewing' : aspectRatio === '1:1' ? 'social media squares' : 'widescreen viewing'}
-• Professional subtitle styling
-• Timeline-synced editing
-• Export-ready formatting
+Created with Veo-3 Technology for HackMIT 2025
 
-📋 CAPTION TIMELINE:
-${captions.map(c => `⏰ ${Math.floor(c.start)}:${Math.floor((c.start % 1) * 60).toString().padStart(2, '0')} - ${Math.floor(c.end)}:${Math.floor((c.end % 1) * 60).toString().padStart(2, '0')} | "${c.text}"`).join('\n')}
+📊 Video Details:
+• Aspect Ratio: ${aspectRatio}
+• Captions: ${captions.length} synchronized overlays
+• Processing: AI-Enhanced quality
+• Platform: Cross-platform optimized
 
-🔧 TECHNICAL SPECS:
+🚀 Features:
 • Video Processing: AI-Enhanced
 • Caption System: Precision-timed overlays
 • Format: Professional ${aspectRatio} ratio

@@ -14,6 +14,7 @@
     "test:youtube": "node scripts/test-real-youtube.mjs",
     "test:flow": "node scripts/test-complete-flow.mjs",
     "setup:youtube": "node scripts/setup-youtube-oauth.mjs",
+    "test:youtube-quick": "node scripts/quick-youtube-test.mjs",
     "remotion:studio": "remotion studio",
     "remotion:render": "remotion render",
     "remotion:preview": "remotion preview",
