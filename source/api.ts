@@ -117,3 +117,42 @@ export async function pollUntilDone(
     await new Promise((res) => setTimeout(res, ms));
   }
 }
+
+// YouTube API functions
+export async function publishToYouTube(videoData: {
+  videoUrl: string;
+  title: string;
+  description: string;
+  tags: string[];
+}) {
+  const response = await fetch(`${API_BASE}/publish-to-youtube`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(videoData),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`YouTube publish failed: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}
+
+// GCS Upload function
+export async function uploadToGCS(file: File, onProgress?: (progress: number) => void) {
+  const formData = new FormData();
+  formData.append('video', file);
+
+  const response = await fetch(`${API_BASE}/upload-to-gcs`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`GCS upload failed: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}

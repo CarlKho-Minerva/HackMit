@@ -26,4 +26,6 @@ dist-ssr
 *.sln
 *.sw?
 service-account-key.json
-*.mp4
+
+# Allow specific demo videos in public folder
+!public/*.mp4

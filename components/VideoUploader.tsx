@@ -1,5 +1,7 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
+import { XMarkIcon } from "./icons";
+import { publishToYouTube, uploadToGCS } from "../source/api";
 
 interface VideoUploaderProps {
   onVideoPublished?: (data: { youtubeUrl: string; videoId: string }) => void;
@@ -58,27 +60,15 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     });
 
     try {
-      const formData = new FormData();
-      formData.append("video", videoFile);
+      const data = await uploadToGCS(videoFile);
 
-      const response = await fetch("http://localhost:3001/api/upload-to-gcs", {
-        method: "POST",
-        body: formData,
+      console.log("✅ Upload successful:", data.url);
+      updateState({
+        isUploading: false,
+        gcsUrl: data.url,
+        statusMessage: "Upload complete! Ready to publish to YouTube.",
+        progress: "uploaded",
       });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("✅ Upload successful:", data.url);
-        updateState({
-          isUploading: false,
-          gcsUrl: data.url,
-          statusMessage: "Upload complete! Ready to publish to YouTube.",
-          progress: "uploaded",
-        });
-      } else {
-        throw new Error(data.error || "Upload failed");
-      }
     } catch (error) {
       console.error("❌ Upload error:", error);
       updateState({
@@ -101,35 +91,22 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
     });
 
     try {
-      const response = await fetch(
-        "http://localhost:3001/api/publish-to-youtube",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            videoUrl: state.gcsUrl,
-            title: `AI Generated Video - ${state.file.name}`,
-            description:
-              "This video was generated using AI and uploaded through our custom pipeline.",
-            tags: ["AI", "generated", "video", "demo"],
-          }),
-        }
-      );
+      const data = await publishToYouTube({
+        videoUrl: state.gcsUrl,
+        title: `AI Generated Video - ${state.file.name}`,
+        description:
+          "This video was generated using AI and uploaded through our custom pipeline.",
+        tags: ["AI", "generated", "video", "demo"],
+      });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log("🚀 YouTube publish successful:", data.youtubeUrl);
-        updateState({
-          isPublishing: false,
-          youtubeUrl: data.youtubeUrl,
-          statusMessage: `🚀 Successfully published to YouTube!`,
-          progress: "published",
-        });
-        onVideoPublished?.(data);
-      } else {
-        throw new Error(data.error || "Publishing failed");
-      }
+      console.log("🚀 YouTube publish successful:", data.youtubeUrl);
+      updateState({
+        isPublishing: false,
+        youtubeUrl: data.youtubeUrl,
+        statusMessage: `🚀 Successfully published to YouTube!`,
+        progress: "published",
+      });
+      onVideoPublished?.(data);
     } catch (error) {
       console.error("❌ Publish error:", error);
       updateState({

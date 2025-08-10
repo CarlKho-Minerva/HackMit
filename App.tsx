@@ -13,6 +13,7 @@ import {VideoUploader} from './components/VideoUploader';
 import {PromptEnhancer} from './components/PromptEnhancer';
 import {FakeLoadingScreen} from './components/FakeLoadingScreen';
 import {MOCK_VIDEOS} from './constants';
+import { publishToYouTube } from './source/api';
 import {Video} from './types';
 import { startFakeGeneration, getFakeJob, FakeGenerationJob } from './source/fakeVideoGeneration';
 
@@ -212,26 +213,16 @@ export const App: React.FC = () => {
     try {
       console.log('🎬 Publishing video to YouTube:', video.title);
 
-      const response = await fetch('http://localhost:3001/api/publish-to-youtube', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          videoUrl: video.videoUrl,
-          title: video.title,
-          description: video.description,
-          tags: ['AI', 'generated', 'video', 'VEO-3', 'HackMIT'],
-        }),
+      const data = await publishToYouTube({
+        videoUrl: video.videoUrl,
+        title: video.title,
+        description: video.description,
+        tags: ['AI', 'generated', 'video', 'VEO-3', 'HackMIT'],
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('✅ YouTube publish successful:', data.youtubeUrl);
-        alert(`🎉 Video published to YouTube!\n\n${data.youtubeUrl}\n\nClick OK to copy the link.`);
-        navigator.clipboard.writeText(data.youtubeUrl);
-      } else {
-        throw new Error(data.error || 'Publishing failed');
-      }
+      console.log('✅ YouTube publish successful:', data.youtubeUrl);
+      alert(`🎉 Video published to YouTube!\n\n${data.youtubeUrl}\n\nClick OK to copy the link.`);
+      navigator.clipboard.writeText(data.youtubeUrl);
     } catch (error) {
       console.error('❌ YouTube publish error:', error);
       alert(`❌ Failed to publish to YouTube: ${error instanceof Error ? error.message : 'Unknown error'}`);
