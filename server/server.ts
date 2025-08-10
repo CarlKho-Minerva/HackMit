@@ -9,6 +9,7 @@ import { publishToYouTube } from './routes/publish-to-youtube';
 import { mergeAudio } from './routes/merge-audio';
 import { trendingSounds } from './routes/trending-sounds';
 import { publishToYouTubeMock } from './routes/publish-to-youtube-mock';
+import { renderRemotionVideo } from '../api/remotion-render';
 
 // Load environment variables:
 // 1) .env (default)
@@ -45,6 +46,7 @@ const upload = multer({
 app.post('/api/upload-to-gcs', upload.single('video'), uploadToGCS);
 app.post('/api/merge-audio', mergeAudio);
 app.get('/api/trending-sounds', trendingSounds);
+app.post('/api/remotion-render', renderRemotionVideo);
 
 // YouTube route - use mock if no real credentials are configured
 const hasYouTubeCredentials = process.env.YOUTUBE_ACCESS_TOKEN &&

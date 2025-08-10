@@ -13,6 +13,7 @@ interface VideoPlayerProps {
   onClose: () => void;
   onPublishToYouTube: (video: Video) => void;
   onDelete?: (video: Video) => void;
+  onStartEdit?: (video: Video) => void;
 }
 
 /**
@@ -23,6 +24,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onClose,
   onPublishToYouTube,
   onDelete,
+  onStartEdit,
 }) => {
   const [isMerging, setIsMerging] = useState(false);
   const [volume, setVolume] = useState(0.6);
@@ -120,6 +122,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   {isMerging ? 'Adding Sound...' : '🎵 Add Trending Sound'}
                 </button>
               </div>
+
+              {/* Remotion Editor Button */}
+              {onStartEdit && (
+                <button
+                  onClick={() => onStartEdit(video)}
+                  className="flex items-center gap-2 bg-blue-600 text-white font-thin py-3 px-4 border border-blue-600 hover:bg-blue-700 hover:border-blue-700 transition-colors text-sm uppercase tracking-wide"
+                  aria-label="Edit video with Remotion"
+                >
+                  <span>✂️</span>
+                  <span className="hidden sm:inline">Edit with Remotion</span>
+                </button>
+              )}
+
               <button
                 onClick={() => onPublishToYouTube(video)}
                 className="flex items-center gap-2 bg-red-600 text-white font-thin py-3 px-4 border border-red-600 hover:bg-red-700 hover:border-red-700 transition-colors text-sm uppercase tracking-wide"

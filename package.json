@@ -13,12 +13,29 @@
     "test:gcs": "node scripts/test-gcs-upload.mjs",
     "test:youtube": "node scripts/test-real-youtube.mjs",
     "test:flow": "node scripts/test-complete-flow.mjs",
-    "setup:youtube": "node scripts/setup-youtube-oauth.mjs"
+    "setup:youtube": "node scripts/setup-youtube-oauth.mjs",
+    "remotion:studio": "remotion studio",
+    "remotion:render": "remotion render",
+    "remotion:preview": "remotion preview",
+    "studio": "remotion studio"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",
     "@google/genai": "^1.9.0",
     "@google/generative-ai": "^0.24.1",
+    "@remotion/bundler": "^4.0.332",
+    "@remotion/cli": "^4.0.332",
+    "@remotion/google-fonts": "^4.0.332",
+    "@remotion/layout-utils": "^4.0.332",
+    "@remotion/media-parser": "^4.0.332",
+    "@remotion/motion-blur": "^4.0.332",
+    "@remotion/player": "^4.0.332",
+    "@remotion/renderer": "^4.0.332",
+    "@remotion/shapes": "^4.0.332",
+    "@remotion/studio": "^4.0.332",
+    "@remotion/tailwind": "^4.0.332",
+    "@remotion/three": "^4.0.332",
+    "@remotion/transitions": "^4.0.332",
     "@tailwindcss/browser": "^4.1.10",
     "@vercel/node": "^5.3.11",
     "cors": "^2.8.5",
@@ -30,6 +47,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
+    "remotion": "^4.0.332",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

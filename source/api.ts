@@ -204,3 +204,35 @@ export async function uploadToGCS(file: File, onProgress?: (progress: number) =>
 
   return response.json();
 }
+
+// Remotion Video Rendering
+export async function renderVideoWithRemotion(params: {
+  videoSrc: string;
+  aspectRatio: '16:9' | '9:16' | '1:1';
+  captions?: Array<{
+    start: number;
+    end: number;
+    text: string;
+  }>;
+  title?: string;
+  subtitleStyle?: {
+    fontSize: number;
+    color: string;
+    backgroundColor: string;
+    fontFamily: string;
+    position: 'bottom' | 'top' | 'center';
+  };
+}) {
+  const response = await fetch(`${API_BASE}/remotion-render`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Remotion render failed: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}
