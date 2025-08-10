@@ -1,12 +1,23 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
 import multer from 'multer';
 import { uploadToGCS } from './routes/upload-to-gcs';
 import { publishToYouTube } from './routes/publish-to-youtube';
+import { mergeAudio } from './routes/merge-audio';
+import { trendingSounds } from './routes/trending-sounds';
 import { publishToYouTubeMock } from './routes/publish-to-youtube-mock';
 
+// Load environment variables:
+// 1) .env (default)
+// 2) .env.local (override if present) to match Vite's local-dev convention
 dotenv.config();
+const localEnvPath = path.resolve(process.cwd(), '.env.local');
+if (fs.existsSync(localEnvPath)) {
+  dotenv.config({ path: localEnvPath, override: true });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -32,6 +43,8 @@ const upload = multer({
 
 // Routes
 app.post('/api/upload-to-gcs', upload.single('video'), uploadToGCS);
+app.post('/api/merge-audio', mergeAudio);
+app.get('/api/trending-sounds', trendingSounds);
 
 // YouTube route - use mock if no real credentials are configured
 const hasYouTubeCredentials = process.env.YOUTUBE_ACCESS_TOKEN &&

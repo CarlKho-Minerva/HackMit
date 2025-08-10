@@ -13,7 +13,7 @@ import {VideoUploader} from './components/VideoUploader';
 import {PromptEnhancer} from './components/PromptEnhancer';
 import {FakeLoadingScreen} from './components/FakeLoadingScreen';
 import {MOCK_VIDEOS} from './constants';
-import { publishToYouTube } from './source/api';
+import { publishToYouTube, mergeAudioIntoVideo, getTrendingSounds, TrendingSound } from './source/api';
 import {Video} from './types';
 import { startFakeGeneration, getFakeJob, FakeGenerationJob } from './source/fakeVideoGeneration';
 
@@ -119,6 +119,12 @@ export const App: React.FC = () => {
   const [rpLoading, setRpLoading] = useState(false);
   const [rpUrl, setRpUrl] = useState("");
   const [rpAspect, setRpAspect] = useState<"9:16" | "1:1" | "16:9">("16:9");
+  const [rpAudioChoice, setRpAudioChoice] = useState<'beep' | 'silence'>('beep');
+  const [rpVolume, setRpVolume] = useState(0.6);
+  const [rpMerging, setRpMerging] = useState(false);
+  const [rpTrending, setRpTrending] = useState<TrendingSound[]>([]);
+  const [rpSelectedSoundId, setRpSelectedSoundId] = useState<string>('');
+  const [rpProvider, setRpProvider] = useState<'deezer' | 'itunes' | 'curated'>('itunes');
 
   // New simplified generation handler
   const handleNewGeneration = async () => {
@@ -201,6 +207,70 @@ export const App: React.FC = () => {
     }
   }
 
+  const ensureHttpUrl = async (maybeDataUrl: string): Promise<string> => {
+    if (!maybeDataUrl.startsWith('data:')) return maybeDataUrl;
+    const res = await fetch(maybeDataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], `merged-${Date.now()}.mp4`, { type: 'video/mp4' });
+    // Dynamic import to avoid circular import at top
+    const uploaded = await (async () => {
+      const { uploadToGCS } = await import('./source/api');
+      return uploadToGCS(file);
+    })();
+    return (uploaded as any).url as string;
+  };
+
+  const handleRunpodAddSound = async () => {
+    if (!rpUrl || rpMerging) return;
+    try {
+      setRpMerging(true);
+      setRpStatus('Adding sound…');
+      const { dataUrl } = await mergeAudioIntoVideo({
+        videoUrl: rpUrl,
+        audioChoice: rpAudioChoice,
+        volume: rpVolume,
+      });
+      setRpUrl(dataUrl);
+      setRpStatus('Done ✅');
+    } catch (e: any) {
+      setRpStatus(`Error: ${e.message || String(e)}`);
+    } finally {
+      setRpMerging(false);
+    }
+  };
+
+  const [rpRegion, setRpRegion] = useState<string>('US');
+
+  const handlePublishRunwayToYouTube = async () => {
+    if (!rpUrl) return;
+    try {
+      setRpStatus('Publishing to YouTube…');
+      const safeUrl = await ensureHttpUrl(rpUrl);
+      const data = await publishToYouTube({
+        videoUrl: safeUrl,
+        title: `AI Generated: ${rpPrompt.slice(0, 50)}${rpPrompt.length > 50 ? '…' : ''}`,
+        description: rpPrompt,
+        tags: ['AI', 'generated', 'video', 'RunPod', 'HackMIT'],
+      });
+      setRpStatus('Published ✅');
+      alert(`🎉 Video published to YouTube!\n\n${data.youtubeUrl}`);
+      navigator.clipboard.writeText(data.youtubeUrl);
+    } catch (e: any) {
+      setRpStatus(`Error: ${e.message || String(e)}`);
+    }
+  };
+
+  const handleLoadTrending = async () => {
+    try {
+      const { sounds } = await getTrendingSounds(rpProvider, rpRegion);
+      console.log('🎵 Trending sounds loaded:', sounds);
+      setRpTrending(sounds);
+      if (sounds.length && !rpSelectedSoundId) setRpSelectedSoundId(sounds[0].id);
+    } catch (e) {
+      console.error('Failed to load trending sounds', e);
+    }
+  };
+
   const handlePlayVideo = (video: Video) => {
     setPlayingVideo(video);
   };
@@ -212,9 +282,9 @@ export const App: React.FC = () => {
   const handlePublishToYouTube = async (video: Video) => {
     try {
       console.log('🎬 Publishing video to YouTube:', video.title);
-
+      const safeUrl = await ensureHttpUrl(video.videoUrl);
       const data = await publishToYouTube({
-        videoUrl: video.videoUrl,
+        videoUrl: safeUrl,
         title: video.title,
         description: video.description,
         tags: ['AI', 'generated', 'video', 'VEO-3', 'HackMIT'],
@@ -375,7 +445,7 @@ export const App: React.FC = () => {
                     Real Runway Generation
                   </h2>
                   <p className="text-white/60 text-sm mb-8 uppercase tracking-wide">
-                    Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend
+                    Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend (VideoCrafter2 model)
                   </p>
 
                   <div className="space-y-8">
@@ -452,14 +522,107 @@ export const App: React.FC = () => {
                           muted
                           className="w-full shadow-none"
                         />
-                        <div className="mt-4">
+                        <div className="mt-4 flex flex-col gap-3">
+                          {/* Primary action row visible immediately */}
+                          <div className="flex items-center gap-3">
+                            <label htmlFor="rp-provider" className="text-xs text-white/70 uppercase tracking-wide">Source</label>
+                            <select
+                              id="rp-provider"
+                              className="bg-black border border-white/30 text-white text-xs px-2 py-2"
+                              value={rpProvider}
+                              onChange={(e) => setRpProvider(e.target.value as 'deezer' | 'itunes' | 'curated')}
+                              aria-label="Trending sounds provider"
+                            >
+                              <option value="deezer" className="bg-black">Deezer</option>
+                              <option value="itunes" className="bg-black">Apple Music</option>
+                              <option value="curated" className="bg-black">Curated</option>
+                            </select>
+                            <label htmlFor="rp-region" className="text-xs text-white/70 uppercase tracking-wide">Region</label>
+                            <input
+                              id="rp-region"
+                              value={rpRegion}
+                              onChange={(e) => setRpRegion(e.target.value.toUpperCase())}
+                              placeholder="US"
+                              className="bg-black border border-white/30 text-white text-xs px-2 py-2 w-16"
+                              aria-label="Region code"
+                            />
+                            <button
+                              onClick={handleLoadTrending}
+                              className="px-4 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition uppercase tracking-wide"
+                              aria-label="Load trending sounds"
+                            >
+                              🎵 Load Trending Sounds
+                            </button>
+                            <button
+                              onClick={handlePublishRunwayToYouTube}
+                              className="px-4 py-2 bg-red-600 text-white border border-red-600 hover:bg-red-700 hover:border-red-700 transition-all duration-300 uppercase tracking-wide text-xs"
+                              aria-label="Publish video to YouTube"
+                            >
+                              📺 Publish to YouTube
+                            </button>
+                          </div>
+
+                          {rpTrending.length > 0 && (
+                            <div className="flex items-center gap-3">
+                              <label htmlFor="rp-trending" className="text-xs text-white/70 uppercase tracking-wide">Trending</label>
+                              <select
+                                id="rp-trending"
+                                className="bg-black border border-white/30 text-white text-xs px-2 py-2"
+                                value={rpSelectedSoundId}
+                                onChange={(e) => setRpSelectedSoundId(e.target.value)}
+                              >
+                                {rpTrending.map(s => (
+                                  <option key={s.id} value={s.id} className="bg-black">{s.title} — {s.artist}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={async () => {
+                                  if (!rpUrl) return;
+                                  const sound = rpTrending.find(s => s.id === rpSelectedSoundId);
+                                  if (!sound) return;
+                                  try {
+                                    setRpMerging(true);
+                                    setRpStatus('Adding sound…');
+                                    const safeVideoUrl = await ensureHttpUrl(rpUrl);
+                                    const { dataUrl } = await mergeAudioIntoVideo({
+                                      videoUrl: safeVideoUrl,
+                                      audioUrl: sound.audioUrl,
+                                      volume: rpVolume,
+                                    });
+                                    setRpUrl(dataUrl);
+                                    setRpStatus('Done ✅');
+                                  } catch (e: any) {
+                                    setRpStatus(`Error: ${e.message || String(e)}`);
+                                  } finally {
+                                    setRpMerging(false);
+                                  }
+                                }}
+                                disabled={rpMerging}
+                                className="px-4 py-2 bg-emerald-600 text-white border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 uppercase tracking-wide text-xs disabled:opacity-50"
+                                aria-label="Add sound to generated video"
+                              >
+                                {rpMerging ? 'Adding…' : '🎵 Add Sound'}
+                              </button>
+                              <button
+                                onClick={handleLoadTrending}
+                                className="px-3 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition"
+                                aria-label="Refresh trending sounds for region"
+                                title="Refresh"
+                              >
+                                Refresh
+                              </button>
+                            </div>
+                          )}
+                          <div>
                           <a
                             href={rpUrl}
                             download
                             className="inline-block px-6 py-3 bg-transparent border border-white/40 text-white hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-wide text-sm"
+                              aria-label="Download generated video"
                           >
                             Download
                           </a>
+                          </div>
                         </div>
                       </div>
                     )}
