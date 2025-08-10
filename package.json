@@ -18,6 +18,7 @@
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",
     "@google/genai": "^1.9.0",
+    "@google/generative-ai": "^0.24.1",
     "@tailwindcss/browser": "^4.1.10",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",

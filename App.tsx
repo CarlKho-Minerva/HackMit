@@ -10,13 +10,18 @@ import {SavingProgressPage} from './components/SavingProgressPage';
 import {VideoGrid} from './components/VideoGrid';
 import {VideoPlayer} from './components/VideoPlayer';
 import {VideoUploader} from './components/VideoUploader';
+import {PromptEnhancer} from './components/PromptEnhancer';
+import {FakeLoadingScreen} from './components/FakeLoadingScreen';
 import {MOCK_VIDEOS} from './constants';
 import {Video} from './types';
+import { startFakeGeneration, getFakeJob, FakeGenerationJob } from './source/fakeVideoGeneration';
 
 import { GeneratedVideo, GoogleGenAI } from "@google/genai";
 
+// 🚨 EXPENSIVE VEO-3 API - ONLY USE WHEN EXPLICITLY ENABLED 🚨
+const USE_REAL_VEO = import.meta.env.VITE_USE_REAL_VEO === 'true';
 const VEO3_MODEL_NAME = "veo-3.0-generate-preview";
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = USE_REAL_VEO ? new GoogleGenAI({ apiKey: process.env.API_KEY }) : null;
 
 import { startJob, pollUntilDone } from "./source/api";
 
@@ -35,10 +40,17 @@ function bloblToBase64(blob: Blob) {
 
 // ---
 
+// 🚨 COMMENTED OUT - EXPENSIVE VEO-3 API CALLS 🚨
+// ONLY UNCOMMENT IF YOU WANT TO BURN $6 PER VIDEO
+/*
 async function generateVideoFromText(
   prompt: string,
   numberOfVideos = 1
 ): Promise<string[]> {
+  if (!USE_REAL_VEO || !ai) {
+    throw new Error("VEO-3 is disabled. Set VITE_USE_REAL_VEO=true to enable (costs $6/video)");
+  }
+
   let operation = await ai.models.generateVideos({
     model: VEO3_MODEL_NAME,
     prompt,
@@ -77,6 +89,7 @@ async function generateVideoFromText(
     throw new Error("No videos generated");
   }
 }
+*/
 
 /**
  * Main component for the Veo3 Gallery app.
@@ -90,6 +103,11 @@ export const App: React.FC = () => {
   const [generationError, setGenerationError] = useState<string[] | null>(null);
   const [currentView, setCurrentView] = useState<'gallery' | 'uploader'>('gallery');
 
+  // New fake generation system
+  const [promptText, setPromptText] = useState("A majestic cat dancing in a cyberpunk alleyway");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentJob, setCurrentJob] = useState<FakeGenerationJob | null>(null);
+
   // -- Runpod quick generate (add-on) --
   const [rpPrompt, setRpPrompt] = useState(
     "A neon cyberpunk CAT bartender, close-up, shallow depth of field, bokeh"
@@ -100,6 +118,62 @@ export const App: React.FC = () => {
   const [rpLoading, setRpLoading] = useState(false);
   const [rpUrl, setRpUrl] = useState("");
   const [rpAspect, setRpAspect] = useState<"9:16" | "1:1" | "16:9">("16:9");
+
+  // New simplified generation handler
+  const handleNewGeneration = async () => {
+    if (!promptText.trim()) return;
+
+    setIsGenerating(true);
+    setGenerationError(null);
+
+    try {
+      const jobId = startFakeGeneration(promptText);
+      const job = getFakeJob(jobId);
+      if (job) {
+        setCurrentJob(job);
+        // Poll for job completion
+        pollFakeJob(jobId);
+      }
+    } catch (error) {
+      console.error('Failed to start generation:', error);
+      setGenerationError(['Failed to start video generation. Please try again.']);
+      setIsGenerating(false);
+    }
+  };
+
+  const pollFakeJob = async (jobId: string) => {
+    const pollInterval = setInterval(() => {
+      const job = getFakeJob(jobId);
+      if (job) {
+        setCurrentJob(job);
+
+        if (job.status === 'completed' && job.videoUrl) {
+          clearInterval(pollInterval);
+          handleJobComplete(job.videoUrl);
+        } else if (job.status === 'error') {
+          clearInterval(pollInterval);
+          setGenerationError(['Video generation failed. Please try again.']);
+          setIsGenerating(false);
+          setCurrentJob(null);
+        }
+      }
+    }, 500);
+  };
+
+  const handleJobComplete = (videoUrl: string) => {
+    const newVideo: Video = {
+      id: crypto.randomUUID(),
+      title: `AI Generated: ${promptText.slice(0, 50)}${promptText.length > 50 ? '...' : ''}`,
+      description: promptText,
+      videoUrl: videoUrl,
+    };
+
+    setVideos((currentVideos) => [newVideo, ...currentVideos]);
+    setPlayingVideo(newVideo);
+    setIsGenerating(false);
+    setCurrentJob(null);
+    setPromptText(""); // Clear the prompt for next generation
+  };
 
   async function handleRunpodGenerate() {
     try {
@@ -134,6 +208,46 @@ export const App: React.FC = () => {
     setPlayingVideo(null);
   };
 
+  const handlePublishToYouTube = async (video: Video) => {
+    try {
+      console.log('🎬 Publishing video to YouTube:', video.title);
+
+      const response = await fetch('http://localhost:3001/api/publish-to-youtube', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoUrl: video.videoUrl,
+          title: video.title,
+          description: video.description,
+          tags: ['AI', 'generated', 'video', 'VEO-3', 'HackMIT'],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ YouTube publish successful:', data.youtubeUrl);
+        alert(`🎉 Video published to YouTube!\n\n${data.youtubeUrl}\n\nClick OK to copy the link.`);
+        navigator.clipboard.writeText(data.youtubeUrl);
+      } else {
+        throw new Error(data.error || 'Publishing failed');
+      }
+    } catch (error) {
+      console.error('❌ YouTube publish error:', error);
+      alert(`❌ Failed to publish to YouTube: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const handleDeleteVideo = (video: Video) => {
+    if (window.confirm(`Are you sure you want to delete "${video.title}"?`)) {
+      setVideos(currentVideos => currentVideos.filter(v => v.id !== video.id));
+      if (playingVideo?.id === video.id) {
+        setPlayingVideo(null);
+      }
+      console.log('🗑️ Video deleted:', video.title);
+    }
+  };
+
   const handleStartEdit = (video: Video) => {
     setPlayingVideo(null); // Close player
     setEditingVideo(video); // Open edit page
@@ -149,6 +263,15 @@ export const App: React.FC = () => {
     setGenerationError(null);
 
     try {
+      // 🚨 DISABLED EXPENSIVE VEO-3 CALLS 🚨
+      // Use fake generation instead to avoid burning credits
+      setGenerationError([
+        "VEO-3 regeneration disabled to save costs.",
+        "Use the main AI Generation Studio for new videos with fake generation.",
+        "To enable real VEO-3, set VITE_USE_REAL_VEO=true (costs $6/video)"
+      ]);
+
+      /* COMMENTED OUT EXPENSIVE CODE:
       const promptText = originalVideo.description;
       console.log("Generating video...", promptText);
       const videoObjects = await generateVideoFromText(promptText);
@@ -172,11 +295,12 @@ export const App: React.FC = () => {
 
       setVideos((currentVideos) => [newVideo, ...currentVideos]);
       setPlayingVideo(newVideo); // Go to the new video
+      */
     } catch (error) {
       console.error("Video generation failed:", error);
       setGenerationError([
-        "Veo 3 is only available on the Paid Tier.",
-        "Please select your Cloud Project to get started",
+        "VEO-3 is disabled to prevent accidental charges.",
+        "Use the AI Generation Studio with fake generation instead."
       ]);
     } finally {
       setIsSaving(false);
@@ -240,16 +364,35 @@ export const App: React.FC = () => {
                 {/* AI Generation Studio */}
                 <section className="mb-16 border border-white/20 bg-black p-8">
                   <h2 className="text-2xl font-thin mb-8 text-white uppercase tracking-widest">
-                    Video Generation
+                    AI Video Generation Studio
                   </h2>
+                  <p className="text-white/60 text-sm mb-8 uppercase tracking-wide">
+                    Multi-Shot Prompt Template • VEO-3 Optimized • AI Agent Enhanced
+                  </p>
+
+                  <PromptEnhancer
+                    value={promptText}
+                    onChange={setPromptText}
+                    onGenerate={handleNewGeneration}
+                    isLoading={isGenerating}
+                  />
+                </section>
+
+                {/* Legacy Runpod Section - Keep for backup */}
+                <section className="mb-16 border border-white/20 bg-black p-8">
+                  <h2 className="text-2xl font-thin mb-8 text-white uppercase tracking-widest">
+                    Real Runway Generation
+                  </h2>
+                  <p className="text-white/60 text-sm mb-8 uppercase tracking-wide">
+                    Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend
+                  </p>
 
                   <div className="space-y-8">
-                    <textarea
-                      rows={4}
-                      placeholder="Enter video description..."
-                      className="w-full border border-white/20 bg-black p-6 text-white placeholder-white/40 focus:outline-none focus:border-white transition-all duration-300 resize-none font-mono"
+                    <PromptEnhancer
                       value={rpPrompt}
-                      onChange={(e) => setRpPrompt(e.target.value)}
+                      onChange={setRpPrompt}
+                      onGenerate={handleRunpodGenerate}
+                      isLoading={rpLoading}
                     />
 
                     <div className="grid grid-cols-4 gap-8">
@@ -331,7 +474,11 @@ export const App: React.FC = () => {
                     )}
                   </div>
                 </section>
-                <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
+                <VideoGrid
+                  videos={videos}
+                  onPlayVideo={handlePlayVideo}
+                  onDeleteVideo={handleDeleteVideo}
+                />
               </>
             ) : (
               <VideoUploader
@@ -349,7 +496,16 @@ export const App: React.FC = () => {
         <VideoPlayer
           video={playingVideo}
           onClose={handleClosePlayer}
-          onEdit={handleStartEdit}
+          onPublishToYouTube={handlePublishToYouTube}
+          onDelete={handleDeleteVideo}
+        />
+      )}
+
+      {/* Fake Loading Screen */}
+      {isGenerating && currentJob && (
+        <FakeLoadingScreen
+          job={currentJob}
+          onComplete={handleJobComplete}
         />
       )}
 

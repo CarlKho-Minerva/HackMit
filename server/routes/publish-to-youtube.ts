@@ -1,6 +1,13 @@
 import { Request, Response } from 'express';
 import { google } from 'googleapis';
 import { Readable } from 'stream';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 interface PublishRequest extends Request {
   body: {
@@ -51,15 +58,33 @@ export const publishToYouTube = async (req: PublishRequest, res: Response) => {
       auth: oauth2Client,
     });
 
-    // Download the video from GCS
+    // Download the video from GCS or read local file
     console.log('📥 Downloading video from GCS...');
-    const response = await fetch(videoUrl);
 
-    if (!response.ok) {
-      throw new Error(`Failed to download video: ${response.statusText}`);
+    let videoBuffer: ArrayBuffer;
+
+    // Check if it's the demo Shrek video (local file)
+    if (videoUrl.startsWith('/Shrek_Dancing_Video_Generated.mp4')) {
+      console.log('🎭 Using local Shrek demo video');
+      const localVideoPath = path.join(__dirname, '../../public/Shrek_Dancing_Video_Generated.mp4');
+
+      if (!fs.existsSync(localVideoPath)) {
+        throw new Error('Demo video file not found');
+      }
+
+      const fileBuffer = fs.readFileSync(localVideoPath);
+      videoBuffer = fileBuffer.buffer.slice(fileBuffer.byteOffset, fileBuffer.byteOffset + fileBuffer.byteLength);
+    } else {
+      // Download from GCS URL
+      const response = await fetch(videoUrl);
+
+      if (!response.ok) {
+        throw new Error(`Failed to download video: ${response.statusText}`);
+      }
+
+      videoBuffer = await response.arrayBuffer();
     }
 
-    const videoBuffer = await response.arrayBuffer();
     const videoStream = Readable.from(Buffer.from(videoBuffer));
 
     console.log('⬆️ Uploading to YouTube...');
