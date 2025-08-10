@@ -8,6 +8,7 @@ import { parseMedia } from '@remotion/media-parser';
 import { Video } from '../types';
 import { VideoEditProps } from '../remotion/Root';
 import { AppleMusicTrendingSounds } from './AppleMusicTrendingSounds';
+import { YouTubePostModal } from './YouTubePostModal';
 
 interface RemotionVideoEditorProps {
   video: Video;
@@ -48,6 +49,7 @@ export const RemotionVideoEditor: React.FC<RemotionVideoEditorProps> = ({
   const [videoMetadata, setVideoMetadata] = useState<any>(null);
   const [isRendering, setIsRendering] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showYouTubeModal, setShowYouTubeModal] = useState(false);
 
   // Caption editor state
   const [newCaptionText, setNewCaptionText] = useState('');
@@ -254,58 +256,8 @@ export const RemotionVideoEditor: React.FC<RemotionVideoEditorProps> = ({
       );
 
       if (exportChoice) {
-        // Export and upload to YouTube
-        console.log('🚀 Uploading to YouTube...');
-
-        const youtubeData = {
-          videoUrl: video.videoUrl,
-          title: `HackMIT Demo - AI Video ${new Date().toISOString().slice(0, 10)}`,
-          description: `🎬 Professional AI-Generated Video
-
-Created with Veo-3 Technology for HackMIT 2025
-
-📊 Video Details:
-• Aspect Ratio: ${aspectRatio}
-• Captions: ${captions.length} synchronized overlays
-• Processing: AI-Enhanced quality
-• Platform: Cross-platform optimized
-
-🚀 Features:
-• Video Processing: AI-Enhanced
-• Caption System: Precision-timed overlays
-• Format: Professional ${aspectRatio} ratio
-• Platform: Optimized for cross-platform sharing
-
-#AIVideo #VideoEditing #Captions #${aspectRatio.replace(':', 'x')} #ContentCreation #SocialMedia #Professional #AI #VideoProduction #Digital #Tech #Innovation`,
-          tags: ['AI', 'Video', 'Edit', 'Captions', aspectRatio.replace(':', 'x'), 'VEO3', 'Professional', 'ContentCreation', 'SocialMedia', 'TikTok', 'Instagram', 'YouTube', 'VideoProduction', 'Tech', 'Innovation']
-        };
-
-        try {
-          const { publishToYouTube } = await import('../source/api');
-          const result = await publishToYouTube(youtubeData);
-
-          alert(`🎉 Success!\n\nVideo exported and uploaded to YouTube!\n\nYouTube ID: ${result.videoId || 'Processing...'}\n\nThe video includes all your captions and aspect ratio settings.`);
-
-          // Call save callback with enhanced data
-          onSave({
-            ...video,
-            title: youtubeData.title,
-            description: youtubeData.description,
-            editData: exportData,
-            youtubeId: result.videoId
-          });
-
-        } catch (uploadError) {
-          console.error('YouTube upload failed:', uploadError);
-          alert(`Export completed but YouTube upload failed:\n${uploadError.message}\n\nVideo has been saved locally with all edits.`);
-
-          // Still save locally even if YouTube fails
-          onSave({
-            ...video,
-            title: youtubeData.title,
-            editData: exportData
-          });
-        }
+        // Show YouTube publishing modal instead of direct upload
+        setShowYouTubeModal(true);
       } else {
         // Just save locally
         console.log('💾 Saving locally...');
@@ -323,6 +275,56 @@ Created with Veo-3 Technology for HackMIT 2025
       alert(`❌ Export Failed!\n\n${error.message}\n\nPlease check your connection and try again.`);
     } finally {
       setIsRendering(false);
+    }
+  };
+
+  // Handle YouTube publishing from modal
+  const handleYouTubePublish = async (publishData: {
+    title: string;
+    description: string;
+    tags: string[];
+    privacy: 'public' | 'unlisted' | 'private';
+    category: string;
+    thumbnail?: File;
+  }) => {
+    try {
+      console.log('🚀 Publishing to YouTube with data:', publishData);
+
+      const youtubeData = {
+        videoUrl: video.videoUrl,
+        title: publishData.title,
+        description: publishData.description,
+        tags: publishData.tags,
+        privacy: publishData.privacy,
+        categoryId: publishData.category
+      };
+
+      const { publishToYouTube } = await import('../source/api');
+      const result = await publishToYouTube(youtubeData);
+
+      // Create export data
+      const exportData = {
+        videoSrc: video.videoUrl,
+        aspectRatio,
+        captions: captions.map(({ id, ...rest }) => rest),
+        title: video.title,
+        subtitleStyle,
+        duration: videoDuration,
+        fps: 30
+      };
+
+      // Close modal and show success
+      setShowYouTubeModal(false);
+
+      alert(`🎉 Success!\n\nVideo published to YouTube!\n\nYouTube ID: ${result.videoId || 'Processing...'}\n\nTitle: ${publishData.title}\nPrivacy: ${publishData.privacy}\nTags: ${publishData.tags.join(', ')}`);
+
+      // Update video with YouTube info but stay in editor
+      // Don't call onSave to avoid going back to home
+      console.log('✅ Video published successfully, staying in editor');
+
+    } catch (uploadError) {
+      console.error('YouTube upload failed:', uploadError);
+      alert(`❌ YouTube Upload Failed!\n\n${uploadError.message}\n\nPlease check your connection and try again.`);
     }
   };
 
@@ -379,14 +381,13 @@ Created with Veo-3 Technology for HackMIT 2025
                     <button
                       onClick={() => {
                         setShowExportMenu(false);
-                        handleRender();
+                        setShowYouTubeModal(true);
                       }}
                       className="w-full text-left p-3 hover:bg-white/10 transition-all rounded flex items-center gap-3 mb-2"
                     >
-                      <span className="text-2xl">🚀</span>
                       <div>
-                        <div className="text-white font-medium">Export & Upload to YouTube</div>
-                        <div className="text-white/60 text-sm">Full export with captions + YouTube upload</div>
+                        <div className="text-white font-medium">Publish to YouTube</div>
+                        <div className="text-white/60 text-sm">Professional publishing with custom metadata</div>
                       </div>
                     </button>
 
@@ -437,17 +438,17 @@ Created with Veo-3 Technology for HackMIT 2025
         <div className="flex-1 p-8">
             {/* Video Player */}
             <div className="mb-8">
-              <div className="bg-gray-900 rounded-lg p-6 mb-6">
+                <div className="border border-white/20 rounded-lg p-6 mb-6">
                 <div className="flex justify-center mb-4">
                   <div
-                    className="relative bg-black rounded-lg overflow-hidden"
+                    className="relative rounded-lg overflow-hidden"
                     style={{
                       width: Math.min(800, dimensions.width * 0.4),
                       height: Math.min(800, dimensions.width * 0.4) * (dimensions.height / dimensions.width),
                     }}
                   >
                     {/* Debug info */}
-                    <div className="absolute top-2 left-2 text-xs text-white/60 bg-black/60 px-2 py-1 rounded z-10">
+                    <div className="absolute top-2 left-2 text-xs text-white/60 border border-white/20 px-2 py-1 rounded z-10">
                       {aspectRatio} • {captions.length} captions • {Math.floor(videoDuration)}s
                     </div>
 
@@ -541,7 +542,7 @@ Created with Veo-3 Technology for HackMIT 2025
 
             {/* Timeline View */}
             {showTimeline && (
-              <div className="bg-gray-900 rounded-lg p-6 mb-6">
+              <div className="border border-white/20 rounded-lg p-6 mb-6">
                 <h3 className="text-xl font-bold mb-4 uppercase tracking-widest">Timeline</h3>
                 <div className="relative h-20 bg-black rounded border border-white/20 mb-4">
                   {/* Timeline Track */}
@@ -564,7 +565,7 @@ Created with Veo-3 Technology for HackMIT 2025
                   {captions.map((caption) => (
                     <div
                       key={caption.id}
-                      className="absolute top-6 h-8 bg-blue-500/60 border border-blue-400 rounded text-xs text-white flex items-center justify-center cursor-pointer hover:bg-blue-500/80"
+                      className="absolute top-6 h-8 bg-white/60 border border-white/40 rounded text-xs text-black flex items-center justify-center cursor-pointer hover:bg-white/80"
                       style={{
                         left: `${(caption.start / videoDuration) * 100}%`,
                         width: `${((caption.end - caption.start) / videoDuration) * 100}%`,
@@ -642,7 +643,7 @@ Created with Veo-3 Technology for HackMIT 2025
               </div>
 
               <div>
-                <label className="block text-sm text-white/60 mb-2">Text Color</label>
+                <label className="block bg-black text-sm text-white/60 mb-2">Text Color</label>
                 <input
                   type="color"
                   value={subtitleStyle.color}
@@ -678,14 +679,14 @@ Created with Veo-3 Technology for HackMIT 2025
               <h3 className="text-xl font-bold uppercase tracking-widest">Captions</h3>
               <button
                 onClick={generateAutoCaptions}
-                className="px-3 py-1 text-xs bg-blue-600 hover:bg-blue-700 transition-colors uppercase tracking-wide"
+                className="px-3 py-1 text-xs bg-white text-black hover:bg-white/90 transition-colors uppercase tracking-wide"
               >
                 Auto Generate
               </button>
             </div>
 
             {/* Add Caption Form */}
-            <div className="bg-gray-900 p-4 rounded mb-4">
+            <div className="border border-white/20 p-4 rounded mb-4">
               <div className="space-y-3">
                 <textarea
                   placeholder="Caption text..."
@@ -732,7 +733,7 @@ Created with Veo-3 Technology for HackMIT 2025
             {/* Caption List */}
             <div className="space-y-2 max-h-96 overflow-y-auto">
               {captions.map((caption) => (
-                <div key={caption.id} className="bg-gray-900 p-3 rounded border border-white/10">
+                <div key={caption.id} className="border border-white/20 p-3 rounded border border-white/10">
                   <div className="flex justify-between items-start mb-2">
                     <span className="text-xs text-white/60">
                       {formatTime(caption.start)} - {formatTime(caption.end)}
@@ -748,7 +749,7 @@ Created with Veo-3 Technology for HackMIT 2025
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={() => handleTimelineSeek(caption.start)}
-                      className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 transition-colors"
+                      className="text-xs px-2 py-1 bg-white text-black hover:bg-white/90 transition-colors"
                     >
                       Preview
                     </button>
@@ -782,6 +783,31 @@ Created with Veo-3 Technology for HackMIT 2025
           )}
         </div>
       </div>
+
+      {/* YouTube Publishing Modal */}
+      <YouTubePostModal
+        isOpen={showYouTubeModal}
+        onClose={() => setShowYouTubeModal(false)}
+        onPublish={handleYouTubePublish}
+        defaultTitle={`HackMIT Demo - AI Video ${new Date().toISOString().slice(0, 10)}`}
+        defaultDescription={`🎬 Professional AI-Generated Video
+
+Created with Veo-3 Technology for HackMIT 2025
+
+📊 Video Details:
+• Aspect Ratio: ${aspectRatio}
+• Captions: ${captions.length} synchronized overlays
+• Processing: AI-Enhanced quality
+• Platform: Cross-platform optimized
+
+🚀 Features:
+• Video Processing: AI-Enhanced
+• Caption System: Precision-timed overlays
+• Format: Professional ${aspectRatio} ratio
+• Platform: Optimized for cross-platform sharing
+
+#AIVideo #VideoEditing #Captions #${aspectRatio.replace(':', 'x')} #ContentCreation #SocialMedia #Professional #AI #VideoProduction #Digital #Tech #Innovation`}
+      />
     </div>
   );
 };

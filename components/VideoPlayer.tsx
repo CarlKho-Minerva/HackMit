@@ -137,7 +137,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
               <button
                 onClick={() => onPublishToYouTube(video)}
-                className="flex items-center gap-2 bg-red-600 text-white font-thin py-3 px-4 border border-red-600 hover:bg-red-700 hover:border-red-700 transition-colors text-sm uppercase tracking-wide"
+                className="flex items-center gap-2 bg-red-600 text-white font-thin py-3 px-4 border border border-white/20-600 hover:bg-red-700 hover:border border-white/20-700 transition-colors text-sm uppercase tracking-wide"
                 aria-label="Publish video to YouTube">
                 <span>📺</span>
                 <span className="hidden sm:inline">Publish to YouTube</span>
@@ -145,7 +145,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               {onDelete && (
                 <button
                   onClick={() => onDelete(video)}
-                  className="flex items-center gap-2 bg-transparent text-red-400 font-thin py-3 px-4 border border-red-400/40 hover:bg-red-400/10 hover:border-red-400 transition-colors text-sm uppercase tracking-wide"
+                  className="flex items-center gap-2 bg-transparent text-red-400 font-thin py-3 px-4 border border border-white/20-400/40 hover:bg-red-400/10 hover:border border-white/20-400 transition-colors text-sm uppercase tracking-wide"
                   aria-label="Delete video">
                   <span>🗑️</span>
                   <span className="hidden sm:inline">Delete</span>

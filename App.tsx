@@ -568,7 +568,7 @@ export const App: React.FC = () => {
                             </button>
                             <button
                               onClick={handlePublishRunwayToYouTube}
-                              className="px-4 py-2 bg-red-600 text-white border border-red-600 hover:bg-red-700 hover:border-red-700 transition-all duration-300 uppercase tracking-wide text-xs"
+                              className="px-4 py-2 bg-red-600 text-white border border border-white/20-600 hover:bg-red-700 hover:border border-white/20-700 transition-all duration-300 uppercase tracking-wide text-xs"
                               aria-label="Publish video to YouTube"
                             >
                               📺 Publish to YouTube

@@ -14,7 +14,7 @@ const TRENDING_SOUNDS = [
     genre: 'Pop'
   },
   {
-    id: '2', 
+    id: '2',
     name: 'As It Was',
     artist: 'Harry Styles',
     duration: '2:47',
@@ -57,17 +57,17 @@ export const AppleMusicTrendingSounds: React.FC<AppleMusicTrendingSoundsProps> =
 
   const filteredSounds = TRENDING_SOUNDS.filter(sound => {
     const matchesGenre = selectedGenre === 'All' || sound.genre === selectedGenre;
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       sound.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sound.artist.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesGenre && matchesSearch;
   });
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded p-4">
+    <div className="bg-black border border-gray-600 rounded p-4">
       <div className="flex items-center gap-2 mb-4">
-        <div className="w-6 h-6 rounded bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center">
-          <span className="text-white text-xs font-bold">♪</span>
+        <div className="w-6 h-6 rounded bg-white flex items-center justify-center">
+          <span className="text-black text-xs font-bold">♪</span>
         </div>
         <h3 className="text-white font-medium">Apple Music Trending</h3>
       </div>
@@ -79,9 +79,9 @@ export const AppleMusicTrendingSounds: React.FC<AppleMusicTrendingSoundsProps> =
           placeholder="Search songs or artists..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-blue-500"
+          className="w-full px-3 py-2 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-white"
         />
-        
+
         <div className="flex gap-2 flex-wrap">
           {genres.map(genre => (
             <button
@@ -89,8 +89,8 @@ export const AppleMusicTrendingSounds: React.FC<AppleMusicTrendingSoundsProps> =
               onClick={() => setSelectedGenre(genre)}
               className={`px-3 py-1 rounded text-xs transition-colors ${
                 selectedGenre === genre
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  ? 'bg-white text-black'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
             >
               {genre}
@@ -104,7 +104,7 @@ export const AppleMusicTrendingSounds: React.FC<AppleMusicTrendingSoundsProps> =
         {filteredSounds.map((sound) => (
           <div
             key={sound.id}
-            className="flex items-center justify-between p-3 bg-gray-800 hover:bg-gray-700 rounded cursor-pointer transition-colors"
+            className="flex items-center justify-between p-3  hover:bg-gray-800 rounded cursor-pointer transition-colors border border-gray-700"
             onClick={() => onSelectSound?.(sound)}
           >
             <div className="flex items-center gap-3">
@@ -116,7 +116,7 @@ export const AppleMusicTrendingSounds: React.FC<AppleMusicTrendingSoundsProps> =
                 <div className="text-gray-400 text-xs truncate">{sound.artist}</div>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <span className="text-gray-400 text-xs">{sound.duration}</span>
               <button className="w-6 h-6 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center transition-colors">

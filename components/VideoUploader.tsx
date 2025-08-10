@@ -150,7 +150,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
       case "published":
         return "border-purple-500 bg-purple-50";
       case "error":
-        return "border-red-500 bg-red-50";
+        return "border border-white/20-500 bg-red-50";
       default:
         return "border-gray-300 bg-gray-50";
     }
