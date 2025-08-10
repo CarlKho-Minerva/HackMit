@@ -330,7 +330,7 @@ export const App: React.FC = () => {
                       </div>
                     )}
                   </div>
-                </section>                {/* your existing gallery */}
+                </section>
                 <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
               </>
             ) : (
