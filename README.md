@@ -103,4 +103,3 @@ This project demonstrates:
 ---
 
 Built with ❤️ for HackMIT 2025
->>>>>>> feature/youtube-integration-and-cleanup

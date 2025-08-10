@@ -1,0 +1,71 @@
+/* Minimal black and white design for Veo Gallery */
+
+body {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-feature-settings: normal;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: black;
+  color: white;
+}
+
+/* Gasoek One font class */
+.font-gasoek {
+  font-family: 'Gasoek One', monospace;
+}
+
+/* Text clamp utilities for consistent card heights */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Remove all glassmorphism effects */
+.glass-card {
+  background: black;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Minimal transitions */
+* {
+  transition-property: color, background-color, border-color, opacity;
+  transition-timing-function: ease;
+  transition-duration: 300ms;
+}
+
+/* Black and white selection */
+::selection {
+  background-color: white;
+  color: black;
+}
+
+/* Square focus styles */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 0px;
+}
+
+/* Remove all hover lift effects */
+.hover-lift:hover {
+  transform: none;
+}
+
+/* Minimal grid pattern background */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Remove gradient text effects */
+.gradient-text {
+  color: white;
+}

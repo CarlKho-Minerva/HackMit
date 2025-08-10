@@ -188,7 +188,7 @@ export const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans">
+    <div className="min-h-screen bg-black text-white font-mono">
       {editingVideo ? (
         <EditVideoPage
           video={editingVideo}
@@ -196,133 +196,141 @@ export const App: React.FC = () => {
           onCancel={handleCancelEdit}
         />
       ) : (
-        <div className="mx-auto max-w-[1080px]">
-          <header className="p-6 md:p-8 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text inline-flex items-center gap-4">
-              <VideoCameraIcon className="w-10 h-10 md:w-12 md:h-12" />
-              <span>Veo Gallery</span>
-            </h1>
-            <p className="text-gray-400 mt-2 text-lg">
-              {currentView === 'gallery'
-                ? 'Select a video to generate your own variations'
-                : 'Upload and publish videos to YouTube'}
-            </p>
+        <div className="mx-auto max-w-7xl">
+          <header className="relative px-8 py-24 text-center border-b border-white/20">
+            <div className="relative z-10 max-w-4xl mx-auto">
+              <h1 className="text-8xl tracking-widest text-white mb-8 uppercase font-gasoek">
+                Veo Gallery
+              </h1>
+              <p className="text-white/60 text-xl font-light max-w-3xl mx-auto leading-relaxed mb-16 uppercase tracking-wide">
+                {currentView === 'gallery'
+                  ? 'AI Video Generation System'
+                  : 'Upload & Publishing Interface'}
+              </p>
 
-            {/* Navigation */}
-            <div className="mt-6 flex justify-center space-x-4">
-              <button
-                onClick={() => setCurrentView('gallery')}
-                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  currentView === 'gallery'
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Gallery
-              </button>
-              <button
-                onClick={() => setCurrentView('uploader')}
-                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  currentView === 'uploader'
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Upload & Publish
-              </button>
+              {/* Navigation */}
+              <div className="flex justify-center gap-0">
+                <button
+                  onClick={() => setCurrentView('gallery')}
+                  className={`px-12 py-6 font-medium text-lg transition-all duration-300 uppercase tracking-wider ${
+                    currentView === 'gallery'
+                      ? 'bg-white text-black'
+                      : 'bg-transparent text-white border border-white/40 hover:bg-white/10'
+                  }`}
+                >
+                  Gallery
+                </button>
+                <button
+                  onClick={() => setCurrentView('uploader')}
+                  className={`px-12 py-6 font-medium text-lg transition-all duration-300 uppercase tracking-wider ${
+                    currentView === 'uploader'
+                      ? 'bg-white text-black'
+                      : 'bg-transparent text-white border border-white/40 hover:bg-white/10'
+                  }`}
+                >
+                  Upload
+                </button>
+              </div>
             </div>
           </header>
 
-          <main className="px-4 md:px-8 pb-8">
+          <main className="px-8 py-16 bg-black" style={{backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)", backgroundSize: "32px 32px"}}>
             {currentView === 'gallery' ? (
               <>
-                {/* --- Quick Runpod generation card --- */}
-                <section className="mb-8 rounded-lg border border-gray-700 bg-gray-800 p-4">
-                  <h2 className="text-lg font-semibold mb-3">
-                    Quick Generate (VC2 on Runpod)
+                {/* AI Generation Studio */}
+                <section className="mb-16 border border-white/20 bg-black p-8">
+                  <h2 className="text-2xl font-thin mb-8 text-white uppercase tracking-widest">
+                    Video Generation
                   </h2>
 
-                  <div className="grid gap-3">
+                  <div className="space-y-8">
                     <textarea
-                      rows={3}
-                      className="w-full rounded border border-gray-600 bg-gray-900 p-2"
+                      rows={4}
+                      placeholder="Enter video description..."
+                      className="w-full border border-white/20 bg-black p-6 text-white placeholder-white/40 focus:outline-none focus:border-white transition-all duration-300 resize-none font-mono"
                       value={rpPrompt}
                       onChange={(e) => setRpPrompt(e.target.value)}
                     />
 
-                    <div className="flex flex-wrap items-center gap-4">
-                      <label className="flex items-center gap-2 text-sm">
-                        Seconds
+                    <div className="grid grid-cols-4 gap-8">
+                      <div className="flex flex-col">
+                        <label className="text-white/60 text-sm font-medium mb-3 uppercase tracking-wide">Duration</label>
                         <input
                           type="number"
                           min={1}
                           max={10}
-                          className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                          className="border border-white/20 bg-black p-4 text-white focus:outline-none focus:border-white font-mono"
                           value={rpSeconds}
                           onChange={(e) =>
                             setRpSeconds(parseInt(e.target.value || "1"))
                           }
                         />
-                      </label>
+                      </div>
 
-                      <label className="flex items-center gap-2 text-sm">
-                        Steps
+                      <div className="flex flex-col">
+                        <label className="text-white/60 text-sm font-medium mb-3 uppercase tracking-wide">Quality</label>
                         <input
                           type="number"
                           min={10}
                           max={60}
-                          className="w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                          className="border border-white/20 bg-black p-4 text-white focus:outline-none focus:border-white font-mono"
                           value={rpSteps}
                           onChange={(e) =>
                             setRpSteps(parseInt(e.target.value || "10"))
                           }
                         />
-                      </label>
+                      </div>
 
-                      <label className="text-sm">
-                        Aspect
+                      <div className="flex flex-col">
+                        <label className="text-white/60 text-sm font-medium mb-3 uppercase tracking-wide">Aspect</label>
                         <select
-                          className="ml-2 rounded bg-gray-900 border border-gray-600 p-1"
+                          className="border border-white/20 bg-black p-4 text-white focus:outline-none focus:border-white font-mono"
                           value={rpAspect}
                           onChange={(e) => setRpAspect(e.target.value as any)}
                         >
-                          <option value="16:9">16:9 (landscape)</option>
-                          <option value="1:1">1:1 (square)</option>
-                          <option value="9:16">9:16 (portrait)</option>
+                          <option value="16:9" className="bg-black">16:9</option>
+                          <option value="1:1" className="bg-black">1:1</option>
+                          <option value="9:16" className="bg-black">9:16</option>
                         </select>
-                      </label>
+                      </div>
 
-                      <button
-                        onClick={handleRunpodGenerate}
-                        disabled={rpLoading}
-                        className="ml-auto rounded bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white disabled:opacity-60"
-                      >
-                        {rpLoading ? "Generating…" : "Generate"}
-                      </button>
+                      <div className="flex flex-col justify-end">
+                        <button
+                          onClick={handleRunpodGenerate}
+                          disabled={rpLoading}
+                          className="px-8 py-4 bg-white text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium uppercase tracking-wide"
+                        >
+                          {rpLoading ? "Processing" : "Generate"}
+                        </button>
+                      </div>
                     </div>
 
-                    <p className="text-sm text-gray-400">{rpStatus}</p>
+                    {rpStatus && (
+                      <div className="border border-white/20 bg-black p-4 text-white/70 font-mono text-sm">{rpStatus}</div>
+                    )}
 
                     {rpUrl && (
-                      <div className="mt-2">
+                      <div className="border border-white/20 bg-black p-6">
                         <video
                           src={rpUrl}
                           controls
                           playsInline
                           muted
-                          className="max-w-full max-h-[70vh] rounded border border-gray-700"
+                          className="w-full shadow-none"
                         />
-                        <div className="mt-2 text-sm">
-                          <a href={rpUrl} download className="underline">
-                            ⬇️ Download MP4
+                        <div className="mt-4">
+                          <a
+                            href={rpUrl}
+                            download
+                            className="inline-block px-6 py-3 bg-transparent border border-white/40 text-white hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-wide text-sm"
+                          >
+                            Download
                           </a>
                         </div>
                       </div>
                     )}
                   </div>
                 </section>
-
-                {/* your existing gallery */}
                 <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
               </>
             ) : (
