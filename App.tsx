@@ -9,6 +9,7 @@ import {VideoCameraIcon} from './components/icons';
 import {SavingProgressPage} from './components/SavingProgressPage';
 import {VideoGrid} from './components/VideoGrid';
 import {VideoPlayer} from './components/VideoPlayer';
+import {VideoUploader} from './components/VideoUploader';
 import {MOCK_VIDEOS} from './constants';
 import {Video} from './types';
 
@@ -87,6 +88,7 @@ export const App: React.FC = () => {
   const [editingVideo, setEditingVideo] = useState<Video | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [generationError, setGenerationError] = useState<string[] | null>(null);
+  const [currentView, setCurrentView] = useState<'gallery' | 'uploader'>('gallery');
 
   const handlePlayVideo = (video: Video) => {
     setPlayingVideo(video);
@@ -165,11 +167,47 @@ export const App: React.FC = () => {
               <span>Veo Gallery</span>
             </h1>
             <p className="text-gray-400 mt-2 text-lg">
-              Select a video to generate your own variations
+              {currentView === 'gallery'
+                ? 'Select a video to generate your own variations'
+                : 'Upload and publish videos to YouTube'}
             </p>
+
+            {/* Navigation */}
+            <div className="mt-6 flex justify-center space-x-4">
+              <button
+                onClick={() => setCurrentView('gallery')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  currentView === 'gallery'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Gallery
+              </button>
+              <button
+                onClick={() => setCurrentView('uploader')}
+                className={`px-6 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  currentView === 'uploader'
+                    ? 'bg-purple-600 text-white shadow-lg'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                Upload & Publish
+              </button>
+            </div>
           </header>
+
           <main className="px-4 md:px-8 pb-8">
-            <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
+            {currentView === 'gallery' ? (
+              <VideoGrid videos={videos} onPlayVideo={handlePlayVideo} />
+            ) : (
+              <VideoUploader
+                onVideoPublished={(data) => {
+                  console.log('Video published successfully:', data);
+                  // You could add the published video to your gallery here
+                }}
+              />
+            )}
           </main>
         </div>
       )}
@@ -186,7 +224,7 @@ export const App: React.FC = () => {
         <ErrorModal
           message={generationError}
           onClose={() => setGenerationError(null)}
-          onSelectKey={async () => await window.aistudio?.openSelectKey()}
+          onSelectKey={async () => await (window as any).aistudio?.openSelectKey()}
         />
       )}
     </div>

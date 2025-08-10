@@ -6,16 +6,38 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "server": "tsx server/server.ts",
+    "server:dev": "tsx watch server/server.ts",
+    "start:all": "concurrently \"npm run dev\" \"npm run server:dev\"",
+    "test:gcs": "node scripts/test-gcs-upload.mjs",
+    "test:youtube": "node scripts/test-real-youtube.mjs",
+    "test:flow": "node scripts/test-complete-flow.mjs",
+    "setup:youtube": "node scripts/setup-youtube-oauth.mjs"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.16.0",
+    "@google/genai": "^1.9.0",
+    "@tailwindcss/browser": "^4.1.10",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "googleapis": "^155.0.1",
+    "multer": "^2.0.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "@google/genai": "^1.9.0",
-    "@tailwindcss/browser": "^4.1.10"
+    "react-dropzone": "^14.3.8",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
     "@types/node": "^22.14.0",
+    "@types/react-dropzone": "^4.2.2",
+    "@types/uuid": "^10.0.0",
+    "concurrently": "^9.2.0",
+    "tsx": "^4.20.3",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
