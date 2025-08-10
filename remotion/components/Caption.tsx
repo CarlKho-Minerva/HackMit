@@ -39,6 +39,11 @@ export const Caption: React.FC<CaptionProps> = ({
     opacity = 1,
   } = style;
 
+  // Debug logging
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Caption render:', { text, frame, animationFrame, opacity });
+  }
+
   // Animation calculations
   const slideUpAnimation = spring({
     frame: animationFrame,

@@ -59,15 +59,42 @@ export const EditableVideo: React.FC<VideoEditProps> = ({
     caption => currentTime >= caption.start && currentTime <= caption.end
   );
 
+  // Debug logging for captions
+  if (process.env.NODE_ENV === 'development' && frame % 30 === 0) {
+    console.log('EditableVideo debug:', {
+      frame,
+      currentTime,
+      totalCaptions: captions.length,
+      activeCaptions: activeCaptions.length,
+      videoSrc: videoSrc.substring(0, 50) + '...'
+    });
+  }
+
   return (
     <AbsoluteFill style={{ backgroundColor: '#000000' }}>
       {/* Background Video */}
-      <Video
-        src={videoSrc}
-        style={videoStyle}
-        startFrom={0}
-        endAt={durationInFrames}
-      />
+      {videoSrc ? (
+        <Video
+          src={videoSrc}
+          style={videoStyle}
+          startFrom={0}
+          endAt={durationInFrames}
+        />
+      ) : (
+        <div
+          style={{
+            ...videoStyle,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#333',
+            color: '#fff',
+            fontSize: '24px',
+          }}
+        >
+          No Video Source
+        </div>
+      )}
 
       {/* Title Overlay (first 2 seconds) */}
       {title && frame < 60 && (

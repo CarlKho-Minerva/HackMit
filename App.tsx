@@ -405,6 +405,17 @@ export const App: React.FC = () => {
                   : 'Upload & Publishing Interface'}
               </p>
 
+              {/* Test Remotion Editor Button */}
+              <div className="mb-8">
+                <button
+                  onClick={() => handleStartEdit(MOCK_VIDEOS[0])}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white transition-all duration-300 uppercase tracking-wide font-medium mr-4"
+                >
+                  🎬 Test Video Editor
+                </button>
+                <span className="text-white/40 text-sm">Click to test Remotion editor with sample video</span>
+              </div>
+
               {/* Navigation */}
               <div className="flex justify-center gap-0">
                 <button
@@ -455,17 +466,18 @@ export const App: React.FC = () => {
                   />
                 </section>
 
-                {/* Legacy Runpod Section - Keep for backup */}
-                <section className="mb-16 border border-white/20 bg-black p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <div>
-                      <h2 className="text-2xl font-thin text-white uppercase tracking-widest">
-                        Real Runway Generation
-                      </h2>
-                      <p className="text-white/60 text-sm mt-2 uppercase tracking-wide">
-                        Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend (VideoCrafter2 model)
-                      </p>
-                    </div>
+                {/* Legacy Runpod Section - HIDDEN FOR HACKATHON */}
+                {false && (
+                  <section className="mb-16 border border-white/20 bg-black p-8">
+                    <div className="flex items-center justify-between mb-8">
+                      <div>
+                        <h2 className="text-2xl font-thin text-white uppercase tracking-widest">
+                          Real Runway Generation
+                        </h2>
+                        <p className="text-white/60 text-sm mt-2 uppercase tracking-wide">
+                          Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend (VideoCrafter2 model)
+                        </p>
+                      </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-red-500"></div>
                       <span className="text-white/60 text-sm uppercase tracking-wide">Offline</span>
@@ -580,10 +592,12 @@ export const App: React.FC = () => {
                     )}
                   </div>
                 </section>
+                )}
                 <VideoGrid
                   videos={videos}
                   onPlayVideo={handlePlayVideo}
                   onDeleteVideo={handleDeleteVideo}
+                  onEditVideo={handleStartEdit}
                 />
               </>
             ) : (
@@ -624,13 +638,15 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* RunPod Trending Sounds Modal */}
-      <TrendingSoundsModal
-        isOpen={showRpTrendingModal}
-        onClose={() => setShowRpTrendingModal(false)}
-        onSelectSound={handleSelectRpTrendingSound}
-        isLoading={rpMerging}
-      />
+      {/* RunPod Trending Sounds Modal - HIDDEN FOR HACKATHON */}
+      {false && (
+        <TrendingSoundsModal
+          isOpen={showRpTrendingModal}
+          onClose={() => setShowRpTrendingModal(false)}
+          onSelectSound={handleSelectRpTrendingSound}
+          isLoading={rpMerging}
+        />
+      )}
     </div>
   );
 };

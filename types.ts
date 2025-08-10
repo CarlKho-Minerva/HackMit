@@ -11,4 +11,14 @@ export interface Video {
   videoUrl: string;
   title: string;
   description: string;
+  editData?: {
+    videoSrc: string;
+    aspectRatio: string;
+    captions: Array<{ start: number; end: number; text: string }>;
+    title: string;
+    subtitleStyle: any;
+    duration: number;
+    fps: number;
+  };
+  youtubeId?: string;
 }

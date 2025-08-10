@@ -11,6 +11,7 @@ interface VideoGridProps {
   videos: Video[];
   onPlayVideo: (video: Video) => void;
   onDeleteVideo?: (video: Video) => void;
+  onEditVideo?: (video: Video) => void;
 }
 
 /**
@@ -20,6 +21,7 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
   videos,
   onPlayVideo,
   onDeleteVideo,
+  onEditVideo,
 }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -35,6 +37,7 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
                 video={video}
                 onPlay={onPlayVideo}
                 onDelete={onDeleteVideo}
+                onEdit={onEditVideo}
                 showDelete={isUserGenerated}
               />
             </div>

@@ -10,17 +10,25 @@ interface VideoCardProps {
   video: Video;
   onPlay: (video: Video) => void;
   onDelete?: (video: Video) => void;
+  onEdit?: (video: Video) => void;
   showDelete?: boolean;
 }
 
 /**
  * A component that renders a video card with a thumbnail, title, and play button.
  */
-export const VideoCard: React.FC<VideoCardProps> = ({video, onPlay, onDelete, showDelete = false}) => {
+export const VideoCard: React.FC<VideoCardProps> = ({video, onPlay, onDelete, onEdit, showDelete = false}) => {
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onDelete) {
       onDelete(video);
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit(video);
     }
   };
 
@@ -53,6 +61,17 @@ export const VideoCard: React.FC<VideoCardProps> = ({video, onPlay, onDelete, sh
           </h3>
         </div>
       </button>
+
+      {/* Edit button - show for all videos */}
+      {onEdit && (
+        <button
+          onClick={handleEdit}
+          className="absolute top-2 left-2 bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-2 opacity-0 group-hover:opacity-100 transition-all duration-300 text-xs uppercase tracking-wide"
+          aria-label="Edit video"
+        >
+          ✂️ Edit
+        </button>
+      )}
 
       {/* Delete button - only show for user-generated content */}
       {showDelete && onDelete && (
