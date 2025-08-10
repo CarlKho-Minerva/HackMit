@@ -12,6 +12,7 @@ import {VideoPlayer} from './components/VideoPlayer';
 import {VideoUploader} from './components/VideoUploader';
 import {PromptEnhancer} from './components/PromptEnhancer';
 import {FakeLoadingScreen} from './components/FakeLoadingScreen';
+import {TrendingSoundsModal} from './components/TrendingSoundsModal';
 import {MOCK_VIDEOS} from './constants';
 import { publishToYouTube, mergeAudioIntoVideo, getTrendingSounds, TrendingSound } from './source/api';
 import {Video} from './types';
@@ -122,9 +123,9 @@ export const App: React.FC = () => {
   const [rpAudioChoice, setRpAudioChoice] = useState<'beep' | 'silence'>('beep');
   const [rpVolume, setRpVolume] = useState(0.6);
   const [rpMerging, setRpMerging] = useState(false);
-  const [rpTrending, setRpTrending] = useState<TrendingSound[]>([]);
-  const [rpSelectedSoundId, setRpSelectedSoundId] = useState<string>('');
-  const [rpProvider, setRpProvider] = useState<'deezer' | 'itunes' | 'curated'>('itunes');
+  const [showRpTrendingModal, setShowRpTrendingModal] = useState(false);
+
+  // Removed old trending state - now handled by modal
 
   // New simplified generation handler
   const handleNewGeneration = async () => {
@@ -239,8 +240,6 @@ export const App: React.FC = () => {
     }
   };
 
-  const [rpRegion, setRpRegion] = useState<string>('US');
-
   const handlePublishRunwayToYouTube = async () => {
     if (!rpUrl) return;
     try {
@@ -250,7 +249,7 @@ export const App: React.FC = () => {
         videoUrl: safeUrl,
         title: `AI Generated: ${rpPrompt.slice(0, 50)}${rpPrompt.length > 50 ? '…' : ''}`,
         description: rpPrompt,
-        tags: ['AI', 'generated', 'video', 'RunPod', 'HackMIT'],
+        tags: ['AI', 'generated', 'video', 'RunPod'],
       });
       setRpStatus('Published ✅');
       alert(`🎉 Video published to YouTube!\n\n${data.youtubeUrl}`);
@@ -260,14 +259,23 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleLoadTrending = async () => {
+  const handleSelectRpTrendingSound = async (sound: TrendingSound, soundVolume: number) => {
+    if (!rpUrl) return;
     try {
-      const { sounds } = await getTrendingSounds(rpProvider, rpRegion);
-      console.log('🎵 Trending sounds loaded:', sounds);
-      setRpTrending(sounds);
-      if (sounds.length && !rpSelectedSoundId) setRpSelectedSoundId(sounds[0].id);
-    } catch (e) {
-      console.error('Failed to load trending sounds', e);
+      setRpMerging(true);
+      setRpStatus('Adding sound…');
+      const safeVideoUrl = await ensureHttpUrl(rpUrl);
+      const { dataUrl } = await mergeAudioIntoVideo({
+        videoUrl: safeVideoUrl,
+        audioUrl: sound.audioUrl,
+        volume: soundVolume,
+      });
+      setRpUrl(dataUrl);
+      setRpStatus('Done ✅');
+    } catch (e: any) {
+      setRpStatus(`Error: ${e.message || String(e)}`);
+    } finally {
+      setRpMerging(false);
     }
   };
 
@@ -287,7 +295,7 @@ export const App: React.FC = () => {
         videoUrl: safeUrl,
         title: video.title,
         description: video.description,
-        tags: ['AI', 'generated', 'video', 'VEO-3', 'HackMIT'],
+        tags: ['AI', 'generated', 'video', 'VEO-3'],
       });
 
       console.log('✅ YouTube publish successful:', data.youtubeUrl);
@@ -385,7 +393,7 @@ export const App: React.FC = () => {
           <header className="relative px-8 py-24 text-center border-b border-white/20">
             <div className="relative z-10 max-w-4xl mx-auto">
               <h1 className="text-8xl tracking-widest text-white mb-8 uppercase font-gasoek">
-                Veo Gallery
+                Viral-Veo
               </h1>
               <p className="text-white/60 text-xl font-light max-w-3xl mx-auto leading-relaxed mb-16 uppercase tracking-wide">
                 {currentView === 'gallery'
@@ -403,7 +411,7 @@ export const App: React.FC = () => {
                       : 'bg-transparent text-white border border-white/40 hover:bg-white/10'
                   }`}
                 >
-                  Gallery
+                  Viral View
                 </button>
                 <button
                   onClick={() => setCurrentView('uploader')}
@@ -424,12 +432,16 @@ export const App: React.FC = () => {
               <>
                 {/* AI Generation Studio */}
                 <section className="mb-16 border border-white/20 bg-black p-8">
-                  <h2 className="text-2xl font-thin mb-8 text-white uppercase tracking-widest">
-                    AI Video Generation Studio
-                  </h2>
-                  <p className="text-white/60 text-sm mb-8 uppercase tracking-wide">
-                    Multi-Shot Prompt Template • VEO-3 Optimized • AI Agent Enhanced
-                  </p>
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h2 className="text-2xl font-thin text-white uppercase tracking-widest">
+                        AI Video Generation Studio (Demo)
+                      </h2>
+                      <p className="text-white/60 text-sm mt-2 uppercase tracking-wide">
+                        Multi-Shot Prompt Template • VEO-3 Optimized • AI Agent Enhanced
+                      </p>
+                    </div>
+                  </div>
 
                   <PromptEnhancer
                     value={promptText}
@@ -441,19 +453,27 @@ export const App: React.FC = () => {
 
                 {/* Legacy Runpod Section - Keep for backup */}
                 <section className="mb-16 border border-white/20 bg-black p-8">
-                  <h2 className="text-2xl font-thin mb-8 text-white uppercase tracking-widest">
-                    Real Runway Generation
-                  </h2>
-                  <p className="text-white/60 text-sm mb-8 uppercase tracking-wide">
-                    Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend (VideoCrafter2 model)
-                  </p>
+                  <div className="flex items-center justify-between mb-8">
+                    <div>
+                      <h2 className="text-2xl font-thin text-white uppercase tracking-widest">
+                        Real Runway Generation
+                      </h2>
+                      <p className="text-white/60 text-sm mt-2 uppercase tracking-wide">
+                        Gemini-Enhanced Prompts • Real Video Output • Runway/RunPod Backend (VideoCrafter2 model)
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <span className="text-white/60 text-sm uppercase tracking-wide">Offline</span>
+                    </div>
+                  </div>
 
                   <div className="space-y-8">
                     <PromptEnhancer
                       value={rpPrompt}
                       onChange={setRpPrompt}
-                      onGenerate={handleRunpodGenerate}
                       isLoading={rpLoading}
+                      showGenerateButton={false}
                     />
 
                     <div className="grid grid-cols-4 gap-8">
@@ -523,35 +543,15 @@ export const App: React.FC = () => {
                           className="w-full shadow-none"
                         />
                         <div className="mt-4 flex flex-col gap-3">
-                          {/* Primary action row visible immediately */}
+                          {/* Primary action row */}
                           <div className="flex items-center gap-3">
-                            <label htmlFor="rp-provider" className="text-xs text-white/70 uppercase tracking-wide">Source</label>
-                            <select
-                              id="rp-provider"
-                              className="bg-black border border-white/30 text-white text-xs px-2 py-2"
-                              value={rpProvider}
-                              onChange={(e) => setRpProvider(e.target.value as 'deezer' | 'itunes' | 'curated')}
-                              aria-label="Trending sounds provider"
-                            >
-                              <option value="deezer" className="bg-black">Deezer</option>
-                              <option value="itunes" className="bg-black">Apple Music</option>
-                              <option value="curated" className="bg-black">Curated</option>
-                            </select>
-                            <label htmlFor="rp-region" className="text-xs text-white/70 uppercase tracking-wide">Region</label>
-                            <input
-                              id="rp-region"
-                              value={rpRegion}
-                              onChange={(e) => setRpRegion(e.target.value.toUpperCase())}
-                              placeholder="US"
-                              className="bg-black border border-white/30 text-white text-xs px-2 py-2 w-16"
-                              aria-label="Region code"
-                            />
                             <button
-                              onClick={handleLoadTrending}
-                              className="px-4 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition uppercase tracking-wide"
-                              aria-label="Load trending sounds"
+                              onClick={() => setShowRpTrendingModal(true)}
+                              disabled={rpMerging}
+                              className="px-4 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition uppercase tracking-wide disabled:opacity-50"
+                              aria-label="Add trending sound to video"
                             >
-                              🎵 Load Trending Sounds
+                              {rpMerging ? 'Adding Sound...' : '🎵 Add Trending Sound'}
                             </button>
                             <button
                               onClick={handlePublishRunwayToYouTube}
@@ -561,58 +561,6 @@ export const App: React.FC = () => {
                               📺 Publish to YouTube
                             </button>
                           </div>
-
-                          {rpTrending.length > 0 && (
-                            <div className="flex items-center gap-3">
-                              <label htmlFor="rp-trending" className="text-xs text-white/70 uppercase tracking-wide">Trending</label>
-                              <select
-                                id="rp-trending"
-                                className="bg-black border border-white/30 text-white text-xs px-2 py-2"
-                                value={rpSelectedSoundId}
-                                onChange={(e) => setRpSelectedSoundId(e.target.value)}
-                              >
-                                {rpTrending.map(s => (
-                                  <option key={s.id} value={s.id} className="bg-black">{s.title} — {s.artist}</option>
-                                ))}
-                              </select>
-                              <button
-                                onClick={async () => {
-                                  if (!rpUrl) return;
-                                  const sound = rpTrending.find(s => s.id === rpSelectedSoundId);
-                                  if (!sound) return;
-                                  try {
-                                    setRpMerging(true);
-                                    setRpStatus('Adding sound…');
-                                    const safeVideoUrl = await ensureHttpUrl(rpUrl);
-                                    const { dataUrl } = await mergeAudioIntoVideo({
-                                      videoUrl: safeVideoUrl,
-                                      audioUrl: sound.audioUrl,
-                                      volume: rpVolume,
-                                    });
-                                    setRpUrl(dataUrl);
-                                    setRpStatus('Done ✅');
-                                  } catch (e: any) {
-                                    setRpStatus(`Error: ${e.message || String(e)}`);
-                                  } finally {
-                                    setRpMerging(false);
-                                  }
-                                }}
-                                disabled={rpMerging}
-                                className="px-4 py-2 bg-emerald-600 text-white border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 uppercase tracking-wide text-xs disabled:opacity-50"
-                                aria-label="Add sound to generated video"
-                              >
-                                {rpMerging ? 'Adding…' : '🎵 Add Sound'}
-                              </button>
-                              <button
-                                onClick={handleLoadTrending}
-                                className="px-3 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition"
-                                aria-label="Refresh trending sounds for region"
-                                title="Refresh"
-                              >
-                                Refresh
-                              </button>
-                            </div>
-                          )}
                           <div>
                           <a
                             href={rpUrl}
@@ -670,6 +618,14 @@ export const App: React.FC = () => {
           onSelectKey={async () => await (window as any).aistudio?.openSelectKey()}
         />
       )}
+
+      {/* RunPod Trending Sounds Modal */}
+      <TrendingSoundsModal
+        isOpen={showRpTrendingModal}
+        onClose={() => setShowRpTrendingModal(false)}
+        onSelectSound={handleSelectRpTrendingSound}
+        isLoading={rpMerging}
+      />
     </div>
   );
 };

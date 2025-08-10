@@ -157,8 +157,8 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 space-y-16 bg-black" style={{backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)", backgroundSize: "32px 32px"}}>
-      <div className="text-center">
+    <div className="max-w-4xl mx-auto space-y-8 bg-black" style={{backgroundImage: "linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)", backgroundSize: "32px 32px"}}>
+      <div className="text-center mb-8">
         <h2 className="text-4xl font-thin text-white mb-6 uppercase tracking-widest">
           Upload System
         </h2>
@@ -171,7 +171,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed p-24 text-center cursor-pointer transition-all duration-300
+          border-2 border-dashed p-16 text-center cursor-pointer transition-all duration-300 mb-8
           ${isDragActive ? "border-white bg-white/5" : "border-white/20"}
           ${
             state.isUploading || state.isPublishing
@@ -265,7 +265,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-center space-x-0">
+      <div className="flex justify-center space-x-4 mb-8">
         <button
           onClick={handlePublish}
           disabled={
@@ -306,7 +306,7 @@ export const VideoUploader: React.FC<VideoUploaderProps> = ({
 
       {/* GCS URL Display */}
       {state.gcsUrl && (
-        <div className="border border-white/20 bg-black p-6">
+        <div className="border border-white/20 bg-black p-6 mb-8">
           <label className="block text-lg font-medium text-white/80 mb-4 uppercase tracking-wide">
             Cloud Storage:
           </label>

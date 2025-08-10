@@ -6,6 +6,7 @@ import React, { useMemo, useState } from 'react';
 import {Video} from '../types';
 import {XMarkIcon} from './icons';
 import { mergeAudioIntoVideo, getTrendingSounds, TrendingSound } from '../source/api';
+import { TrendingSoundsModal } from './TrendingSoundsModal';
 
 interface VideoPlayerProps {
   video: Video;
@@ -25,29 +26,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
   const [isMerging, setIsMerging] = useState(false);
   const [volume, setVolume] = useState(0.6);
-  const [trending, setTrending] = useState<TrendingSound[]>([]);
-  const [selectedSoundId, setSelectedSoundId] = useState<string>('');
+  const [showTrendingModal, setShowTrendingModal] = useState(false);
 
-  // Removed beep/silence; use trending only
+  // Removed old trending state - now handled by modal
 
-  const [region, setRegion] = useState<string>('US');
-  const [provider, setProvider] = useState<'deezer' | 'itunes' | 'curated'>('itunes');
-
-  const handleLoadTrending = async () => {
-    try {
-      const { sounds } = await getTrendingSounds(provider, region);
-      console.log(region,'sounds', sounds);
-      setTrending(sounds);
-      if (sounds.length && !selectedSoundId) setSelectedSoundId(sounds[0].id);
-    } catch (err) {
-      console.error('Failed to load trending sounds', err);
-    }
-  };
-
-  const handleAddTrendingSound = async () => {
-    if (isMerging) return;
-    const sound = trending.find((s) => s.id === selectedSoundId);
-    if (!sound) return;
+  const handleSelectTrendingSound = async (sound: TrendingSound, soundVolume: number) => {
     try {
       setIsMerging(true);
       // If the current video is a data URL (e.g., after first merge), upload to GCS to avoid large payloads
@@ -63,7 +46,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       const { dataUrl } = await mergeAudioIntoVideo({
         videoUrl: safeUrl,
         audioUrl: sound.audioUrl,
-        volume,
+        volume: soundVolume,
       });
       const videoEl = document.querySelector(`video[src="${video.videoUrl}"]`) as HTMLVideoElement | null;
       if (videoEl) {
@@ -125,69 +108,17 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   aria-label="Volume"
                 />
               </div>
-              
+
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={handleLoadTrending}
-                  className="px-3 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition"
-                  aria-label="Load trending sounds"
+                  onClick={() => setShowTrendingModal(true)}
+                  disabled={isMerging}
+                  className="px-4 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition-colors disabled:opacity-50"
+                  aria-label="Add trending sound to video"
                 >
-                  🎵 Load Trending Sounds
+                  {isMerging ? 'Adding Sound...' : '🎵 Add Trending Sound'}
                 </button>
-                {trending.length > 0 && (
-                  <>
-                    <label htmlFor="providerSelect" className="text-xs text-white/70 uppercase tracking-wide">Source</label>
-                    <select
-                      id="providerSelect"
-                      value={provider}
-                      onChange={(e) => setProvider(e.target.value as 'deezer' | 'itunes' | 'curated')}
-                      className="bg-black border border-white/30 text-white text-xs px-2 py-2"
-                      aria-label="Trending sounds provider"
-                    >
-                      <option value="deezer" className="bg-black">Deezer</option>
-                      <option value="itunes" className="bg-black">Apple Music</option>
-                      <option value="curated" className="bg-black">Curated</option>
-                    </select>
-                    <label htmlFor="regionSelect" className="text-xs text-white/70 uppercase tracking-wide">Region</label>
-                    <input
-                      id="regionSelect"
-                      value={region}
-                      onChange={(e) => setRegion(e.target.value.toUpperCase())}
-                      placeholder="US"
-                      className="bg-black border border-white/30 text-white text-xs px-2 py-2 w-16"
-                      aria-label="Region code"
-                    />
-                    <button
-                      onClick={handleLoadTrending}
-                      className="px-3 py-2 bg-transparent border border-white/30 text-white text-xs hover:bg-white hover:text-black transition"
-                      aria-label="Refresh trending sounds for region"
-                      title="Refresh"
-                    >
-                      Refresh
-                    </button>
-                    <label htmlFor="trendingSelect" className="text-xs text-white/70 uppercase tracking-wide">Trending</label>
-                    <select
-                      id="trendingSelect"
-                      className="bg-black border border-white/30 text-white text-xs px-2 py-2"
-                      value={selectedSoundId}
-                      onChange={(e) => setSelectedSoundId(e.target.value)}
-                      aria-label="Select trending sound"
-                    >
-                      {trending.map((s) => (
-                        <option key={s.id} value={s.id} className="bg-black">{s.title} — {s.artist}</option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={handleAddTrendingSound}
-                      disabled={isMerging}
-                      className="px-4 py-2 bg-emerald-600 text-white border border-emerald-600 hover:bg-emerald-700 hover:border-emerald-700 transition-all duration-300 uppercase tracking-wide text-xs disabled:opacity-50"
-                      aria-label="Add sound to video"
-                    >
-                      {isMerging ? 'Adding…' : '🎵 Add Sound'}
-                    </button>
-                  </>
-                )}
               </div>
               <button
                 onClick={() => onPublishToYouTube(video)}
@@ -209,6 +140,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Trending Sounds Modal */}
+      <TrendingSoundsModal
+        isOpen={showTrendingModal}
+        onClose={() => setShowTrendingModal(false)}
+        onSelectSound={handleSelectTrendingSound}
+        isLoading={isMerging}
+      />
     </div>
   );
 };

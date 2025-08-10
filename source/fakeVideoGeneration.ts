@@ -62,8 +62,8 @@ async function simulateGeneration(jobId: string) {
     job.progress = (i / (GENERATION_PHASES.length - 1)) * 100;
 
     if (phase.status === 'completed') {
-      // Use the local Shrek video
-      job.videoUrl = '/Shrek_Dancing_Video_Generated.mp4';
+      // Use the actual video URL from your GCS bucket instead of local file
+      job.videoUrl = 'https://storage.googleapis.com/veo-3-gallery-hack-mit-468523/videos/832dca4c-55ea-4457-a19f-81a721e80acd.mp4';
       job.progress = 100;
     }
 

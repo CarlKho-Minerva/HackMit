@@ -8,15 +8,17 @@ import { geminiEnhancer, PromptEnhancementResult } from '../source/geminiPromptE
 interface PromptEnhancerProps {
   value: string;
   onChange: (value: string) => void;
-  onGenerate: () => void;
+  onGenerate?: () => void;
   isLoading: boolean;
+  showGenerateButton?: boolean;
 }
 
 export const PromptEnhancer: React.FC<PromptEnhancerProps> = ({
   value,
   onChange,
   onGenerate,
-  isLoading
+  isLoading,
+  showGenerateButton = true
 }) => {
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [showEnhancedPrompt, setShowEnhancedPrompt] = useState(false);
@@ -67,15 +69,15 @@ export const PromptEnhancer: React.FC<PromptEnhancerProps> = ({
         <button
           onClick={enhancePrompt}
           disabled={isEnhancing || !value.trim() || isLoading}
-          className="absolute right-2 top-2 px-4 py-2 bg-blue-600 text-white text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium uppercase tracking-wide"
+          className="absolute right-2 top-2 px-4 py-2 bg-white text-black text-sm hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium uppercase tracking-wide"
         >
-          {isEnhancing ? "🤖 AI Working..." : "✨ Enhance"}
+          {isEnhancing ? "AI Working..." : "Enhance"}
         </button>
       </div>
 
       {showEnhancedPrompt && enhancementResult && (
-        <div className="border border-blue-500/50 bg-blue-900/20 p-6 space-y-4">
-          <h3 className="text-lg font-medium text-blue-300 uppercase tracking-wide">
+        <div className="border border-white/50 bg-white/10 p-6 space-y-4">
+          <h3 className="text-lg font-medium text-white uppercase tracking-wide">
             AI-Enhanced VEO Prompt
           </h3>
 
@@ -117,15 +119,17 @@ export const PromptEnhancer: React.FC<PromptEnhancerProps> = ({
         </div>
       )}
 
-      <div className="flex justify-end">
-        <button
-          onClick={onGenerate}
-          disabled={isLoading || !value.trim()}
-          className="px-8 py-4 bg-white text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium uppercase tracking-wide"
-        >
-          {isLoading ? "Generating..." : "Generate Video"}
-        </button>
-      </div>
+      {showGenerateButton && onGenerate && (
+        <div className="flex justify-end">
+          <button
+            onClick={onGenerate}
+            disabled={isLoading || !value.trim()}
+            className="px-8 py-4 bg-white text-black hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium uppercase tracking-wide"
+          >
+            {isLoading ? "Generating..." : "Generate Video"}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

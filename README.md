@@ -1,6 +1,6 @@
-# Veo-3 Gallery
+# Viral-Veo
 
-A professional AI video generation and publishing platform built for HackMIT 2025. Generate videos with Google's Veo-3 AI and automatically publish them to YouTube through a complete cloud pipeline.
+A professional AI video generation and publishing platform. Generate videos with Google's Veo-3 AI and automatically publish them to YouTube through a complete cloud pipeline.
 
 ## 🚀 Quick Start
 
@@ -84,7 +84,7 @@ veo-3-gallery/
 - `npm run start:all` - Start both frontend and backend
 - `npm run build` - Build for production
 
-## 🏆 HackMIT Demo
+## 🚀 Features
 
 This project demonstrates:
 - Real cloud integration (Google Cloud Storage)
@@ -102,4 +102,4 @@ This project demonstrates:
 
 ---
 
-Built with ❤️ for HackMIT 2025
+Built with ❤️ for creators worldwide

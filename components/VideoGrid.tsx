@@ -22,7 +22,7 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
   onDeleteVideo,
 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       {videos
         .filter((video) => video.id)
         .map((video) => {
@@ -30,7 +30,7 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
           const isUserGenerated = !MOCK_VIDEOS.some(mockVideo => mockVideo.id === video.id);
 
           return (
-            <div key={video.id} className="bg-black h-80">
+            <div key={video.id} className="h-80">
               <VideoCard
                 video={video}
                 onPlay={onPlayVideo}

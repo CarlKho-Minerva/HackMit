@@ -25,7 +25,7 @@ export const VideoCard: React.FC<VideoCardProps> = ({video, onPlay, onDelete, sh
   };
 
   return (
-    <div className="relative group">
+    <div className="relative group h-full">
       <button
         type="button"
         className="group w-full h-full text-left bg-black border border-white/20 overflow-hidden transition-all duration-300 hover:border-white cursor-pointer focus:outline-none focus:border-white flex flex-col"
