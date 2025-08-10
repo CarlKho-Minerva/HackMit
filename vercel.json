@@ -17,11 +17,5 @@
       "maxDuration": 300,
       "memory": 1024
     }
-  },
-  "routes": [
-    {
-      "src": "/Shrek_Dancing_Video_Generated.mp4",
-      "dest": "/public/Shrek_Dancing_Video_Generated.mp4"
-    }
-  ]
+  }
 }
