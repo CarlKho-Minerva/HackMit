@@ -74,3 +74,14 @@ export const MOCK_VIDEOS: Video[] = [
     description: `Fluffy Characters Stop Motion: A bright, whimsical forest clearing where oversized, colorful mushrooms grow. Two adorable, fluffy squirrel-like creatures with big, curious eyes are having a picnic. One, wearing a tiny knitted scarf, attempts to open a jar of "Nutty Spread," making frustrated, soft "grunts" and tiny "panting" sounds. The camera is a mid-shot, then slowly zooms in on the struggling jar. The other, an even fluffier creature with a flower behind its ear, giggles softly, then says in a sweet, high-pitched voice, "Need a paw, Squiggle?" A gentle, melodic flute tune plays throughout.`,
   },
 ];
+
+
+// runpod 
+export const ASPECT_PRESETS = {
+  '16:9': { width: 576, height: 320 },
+  '1:1':  { width: 512, height: 512 },
+  '9:16': { width: 320, height: 576 },
+} as const;
+
+export const DEFAULT_FPS = 12;          // fixed
+export const MAX_FRAMES = 48;           // safety cap

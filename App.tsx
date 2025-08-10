@@ -95,10 +95,16 @@ export const App: React.FC = () => {
     "A neon cyberpunk CAT bartender, close-up, shallow depth of field, bokeh"
   );
   const [rpSeconds, setRpSeconds] = useState(6);   // optional controls, keep simple
-  const [rpSteps, setRpSteps] = useState(30);
+  const [rpSteps, setRpSteps] = useState(14);
   const [rpStatus, setRpStatus] = useState("");
   const [rpLoading, setRpLoading] = useState(false);
   const [rpUrl, setRpUrl] = useState("");
+  const [rpAspect, setRpAspect] = useState<"9:16"|"1:1"|"16:9">("9:16");
+  const [rpFps, setRpFps] = useState(24);
+  // optional custom toggle
+  const [useCustom, setUseCustom] = useState(false);
+  const [rpW, setRpW] = useState<number>(704);
+  const [rpH, setRpH] = useState<number>(1280);
 
   async function handleRunpodGenerate() {
     try {
@@ -106,15 +112,33 @@ export const App: React.FC = () => {
       setRpUrl("");
       setRpStatus("Starting…");
   
-      const jobId = await startJob({ prompt: rpPrompt, seconds: rpSeconds, steps: rpSteps });
-      setRpStatus(`Job ${jobId.slice(0, 8)} running…`);
+      const payload: any = {
+        prompt: rpPrompt,
+        seconds: rpSeconds,
+        steps: rpSteps,
+        fps: rpFps,
+      };
+      if (useCustom) {
+        payload.width = rpW;
+        payload.height = rpH;
+      } else {
+        payload.aspect = rpAspect; // "9:16" (default), "1:1", "16:9"
+      }
   
+      const jobId = await startJob({
+        prompt: rpPrompt,
+        seconds: 5,          // 4–5s
+        steps: 16,
+        fps: 24,             // or 20 to drop frames
+        aspect: "9:16"       // backend will choose 576x1024
+        // or width: 576, height: 1024
+      });
+      setRpStatus(`Job ${jobId.slice(0,8)} running…`);
       const url = await pollUntilDone(jobId, 3000);
-      console.log("final url", url);        // should log https://.../files/.../result.mp4
-      setRpUrl(url);                        // <— this drives the <video>
+      setRpUrl(url);
       setRpStatus("Done ✅");
-    } catch (e: any) {
-      setRpStatus(`Error: ${e?.message || String(e)}`);
+    } catch (e:any) {
+      setRpStatus(`Error: ${e.message || String(e)}`);
     } finally {
       setRpLoading(false);
     }
@@ -237,13 +261,74 @@ export const App: React.FC = () => {
                     />
                   </label>
 
-                  <button
-                    onClick={handleRunpodGenerate}
-                    disabled={rpLoading}
-                    className="ml-auto rounded bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white disabled:opacity-60"
-                  >
-                    {rpLoading ? "Generating…" : "Generate"}
-                  </button>
+                    <label className="text-sm">
+                      Aspect
+                      <select
+                        className="ml-2 rounded bg-gray-900 border border-gray-600 p-1"
+                        value={rpAspect}
+                        onChange={(e) => setRpAspect(e.target.value as any)}
+                        disabled={useCustom}
+                      >
+                        <option value="9:16">9:16 (vertical)</option>
+                        <option value="1:1">1:1 (square)</option>
+                        <option value="16:9">16:9 (landscape)</option>
+                      </select>
+                    </label>
+
+                    <label className="text-sm">
+                      FPS
+                      <input
+                        type="number"
+                        min={12}
+                        max={30}
+                        className="ml-2 w-20 rounded bg-gray-900 border border-gray-600 p-1"
+                        value={rpFps}
+                        onChange={(e) => setRpFps(parseInt(e.target.value || "24"))}
+                      />
+                    </label>
+
+                    <label className="text-sm flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={useCustom}
+                        onChange={(e) => setUseCustom(e.target.checked)}
+                      />
+                      Custom size
+                    </label>
+
+                    {useCustom && (
+                      <>
+                        <label className="text-sm">
+                          W
+                          <input
+                            type="number"
+                            className="ml-2 w-24 rounded bg-gray-900 border border-gray-600 p-1"
+                            value={rpW}
+                            onChange={(e) => setRpW(parseInt(e.target.value || "704"))}
+                          />
+                        </label>
+                        <label className="text-sm">
+                          H
+                          <input
+                            type="number"
+                            className="ml-2 w-24 rounded bg-gray-900 border border-gray-600 p-1"
+                            value={rpH}
+                            onChange={(e) => setRpH(parseInt(e.target.value || "1280"))}
+                          />
+                        </label>
+                        <span className="text-xs text-gray-400">
+                          Use multiples of 64 (e.g., 704×1280)
+                        </span>
+                      </>
+                    )}
+
+                    <button
+                      onClick={handleRunpodGenerate}
+                      disabled={rpLoading}
+                      className="ml-auto rounded bg-indigo-500 hover:bg-indigo-600 px-4 py-2 text-white disabled:opacity-60"
+                    >
+                      {rpLoading ? "Generating…" : "Generate"}
+                    </button>
                 </div>
 
                 <p className="text-sm text-gray-400">{rpStatus}</p>

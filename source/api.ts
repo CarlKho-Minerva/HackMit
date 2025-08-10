@@ -1,4 +1,12 @@
-export type GenerateReq = { prompt: string; seconds?: number; steps?: number };
+export type GenerateReq = {
+  prompt: string;
+  seconds?: number;
+  steps?: number;
+  width?: number;
+  height?: number;
+  fps?: number;
+  aspect?: "9:16" | "1:1" | "16:9";
+};
 export type GenerateResp = { job_id: string };
 export type Job =
   | { status: "queued" | "running" }
@@ -14,6 +22,31 @@ if (!BASE) {
   console.warn("VITE_RUNPOD_BASE is missing. Set it in .env.local");
 }
 
+
+const DEFAULT_FPS = 12;
+const MAX_FRAMES = 48;
+
+const { seconds, aspect } = req.body;
+const { width, height } = ASPECT_PRESETS[aspect]; // same mapping as UI
+
+const fps = DEFAULT_FPS;
+const frames = Math.min(Math.max(1, Math.round(seconds * fps)), MAX_FRAMES);
+
+// NOW pass these to the subprocess:
+const args = [
+  "scripts/evaluation/inference.py",
+  "--mode","base",
+  "--ckpt_path", MODEL,
+  "--config", CONFIG,
+  "--savedir", outDir,
+  "--n_samples","1","--bs","1",
+  "--height", String(height),
+  "--width",  String(width),
+  "--ddim_steps", String(ddimSteps),               // from UI if you like
+  "--unconditional_guidance_scale", String(guide), // from UI if you like
+  "--fps", String(fps),
+  "--frames", String(frames),
+];
 
 export async function startJob(body: GenerateReq): Promise<string> {
   console.log(BASE);
