@@ -14,8 +14,10 @@ This contains everything you need to run your app locally.
    `npm run dev`
 
 ### Env
+```
 GEMINI_API_KEY=PLACEHOLDER_API_KEY
 VITE_RUNPOD_BASE=PLACEHOLDER_URL
+```
 
 # Video gen
 Runpod NVIDIA A100 GPU running this video gen model: https://github.com/AILab-CVC/VideoCrafter
