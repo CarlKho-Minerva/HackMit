@@ -17,8 +17,9 @@ const BASE = (import.meta.env.VITE_RUNPOD_BASE as string || "")
   .trim()
   .replace(/\/$/, "");
 
-// Use local proxy in development to avoid CORS issues
-const API_BASE = import.meta.env.DEV ? 'http://localhost:3001/api' : BASE;
+// Use same-origin /api in development so Vite proxy can forward to the backend
+// If BASE is configured for direct RunPod access, prefer serverless proxy when available
+const API_BASE = import.meta.env.DEV ? '/api' : (BASE || '/api');
 
 if (!BASE) {
   console.warn("VITE_RUNPOD_BASE is missing. Set it in .env.local");
@@ -134,6 +135,53 @@ export async function publishToYouTube(videoData: {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`YouTube publish failed: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}
+
+// Merge audio into a video
+export async function mergeAudioIntoVideo(params: {
+  videoUrl: string;
+  audioUrl?: string;
+  audioChoice?: 'beep' | 'silence';
+  volume?: number;
+}): Promise<{ dataUrl: string }> {
+  const response = await fetch(`${API_BASE}/merge-audio`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`merge-audio failed: ${response.status} - ${errorText}`);
+  }
+
+  return response.json();
+}
+
+export type TrendingSound = {
+  id: string;
+  title: string;
+  artist: string;
+  durationSec: number;
+  audioUrl: string;
+  source: string;
+};
+
+export async function getTrendingSounds(provider?: 'deezer' | 'itunes' | 'curated', regionCode?: string): Promise<{ sounds: TrendingSound[] }> {
+  const params = new URLSearchParams();
+  if (provider) params.set('provider', provider);
+  if (regionCode) params.set('region', regionCode);
+  const qs = params.toString() ? `?${params.toString()}` : '';
+  const response = await fetch(`${API_BASE}/trending-sounds${qs}`, {
+    method: 'GET',
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`trending-sounds failed: ${response.status} - ${text}`);
   }
 
   return response.json();
