@@ -55,25 +55,25 @@ export const MOCK_VIDEOS: Video[] = [
     description: `A demo video featuring the beloved ogre Shrek in an entertaining dance sequence. This video serves as an example of AI-generated content and showcases the capabilities of the video generation system. Perfect for testing the gallery functionality and demonstrating the type of content that can be created and shared through the platform.`,
   },
   {
-    id: '7',
+    id: '8',
     title: 'Video Game Trailer: Sci-Fi Urban Chase',
     videoUrl: staticFilesUrl + 'Video_Game_Trailer_Sci_Fi_Urban_Chasemp4.mp4',
     description: `A fast-tracking POV shot through a grimy, neon-lit cyberpunk alleyway at night. Rain slicks the pavement, reflecting the glow of holographic advertisements. The sound of rapid, pounding footsteps and heavy breathing dominates the audio. Suddenly, the camera whips around to a lateral tracking shot following a nimble protagonist (a woman in a hooded jacket) as she leaps over discarded crates, pursued by two heavily armored security drones. Laser fire zaps past, accompanied by sharp "pew-pew" SFX and the whirring of the drones. High-energy, pulsating electronic music drives the action forward. She dives through a narrow opening; the camera follows seamlessly, ending with a shaky cam effect as she lands, panting.`,
   },
   {
-    id: '8',
+    id: '9',
     title: 'Animals in Nature: Bear and River',
     videoUrl: staticFilesUrl + 'Animals_in_Nature_Bear_and_River.mp4',
     description: `A wide shot of a pristine, fast-flowing mountain river at dusk, surrounded by dense pine forest. The camera slowly zooms in to reveal a large, majestic grizzly bear standing knee-deep in the rapids, expertly swiping at salmon. The rushing water sound is prominent, accompanied by the occasional splash as the bear moves. The bear lets out a low, content grumble after catching a fish, then slowly wades to the bank to eat its catch. Faint chirping of unseen birds and distant cicadas fill the background.`,
   },
   {
-    id: '9',
+    id: '10',
     title: 'Kyoto Serenity From Scene to Postcard',
     videoUrl: staticFilesUrl + 'Kyoto_Serenity_From_Scene_to_Postcard.mp4',
     description: `Soft morning light bathes a serene path in Kyoto, lined with ancient, gnarled cherry trees whose delicate pink petals drift gently to the ground. A small herd of wild sika deer, with gentle eyes and velvety antlers, gracefully wanders among the trees, occasionally nibbling on fallen blossoms. A slow, gliding tracking shot follows one particularly elegant deer as it lowers its head to nibble. The only sounds are the soft rustle of leaves, the gentle "pitter-patter" of falling petals, and the occasional soft "sniff" and "munching" from the deer. Faint, distant temple bells chime, adding to the tranquil atmosphere. As the deer lifts its head, looking directly at the camera with calm curiosity, the camera begins a slow, deliberate pull-out. The vibrant scene subtly softens and flattens, its colors shifting to a slightly desaturated, illustrative style, as a crisp, white border gradually appears around the frame, framing the now-static image. The ambient sounds gently fade away, replaced by the soft, distant, single chime of a koto string, holding its note. Overlaid neatly in a classic, elegant font, the words "Kyoto, Japan - Spring Serenity" appear at the bottom of the postcard.`,
   },
   {
-    id: '10',
+    id: '11',
     title: 'Fluffy Characters Picnic in a Mushroom Forest',
     videoUrl:
       staticFilesUrl + 'Fluffy_Characters_Picnic_in_a_Mushroom_Forest.mp4',
@@ -96,4 +96,4 @@ export const ASPECT_OPTIONS = [
   { label: "16:9 (landscape)", value: "16:9" },
   { label: "1:1 (square)",     value: "1:1"  },
   { label: "9:16 (portrait)",  value: "9:16" },
-];     
+];
