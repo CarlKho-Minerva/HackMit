@@ -75,13 +75,19 @@ export const MOCK_VIDEOS: Video[] = [
   },
 ];
 
-
-// runpod 
 export const ASPECT_PRESETS = {
-  '16:9': { width: 576, height: 320 },
-  '1:1':  { width: 512, height: 512 },
-  '9:16': { width: 320, height: 576 },
+  "16:9": { width: 576, height: 320 },
+  "1:1":  { width: 512, height: 512 },
+  "9:16": { width: 320, height: 576 },
 } as const;
 
-export const DEFAULT_FPS = 12;          // fixed
-export const MAX_FRAMES = 48;           // safety cap
+export type AspectKey = keyof typeof ASPECT_PRESETS; // "16:9" | "1:1" | "9:16"
+
+export const DEFAULT_FPS = 12;       // fixed on client
+export const MAX_FRAMES  = 48;       // safety cap
+
+export const ASPECT_OPTIONS = [
+  { label: "16:9 (landscape)", value: "16:9" },
+  { label: "1:1 (square)",     value: "1:1"  },
+  { label: "9:16 (portrait)",  value: "9:16" },
+];     
