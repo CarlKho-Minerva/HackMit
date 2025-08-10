@@ -20,11 +20,13 @@ export const VideoGrid: React.FC<VideoGridProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px">
-      {videos.map((video, index) => (
-        <div key={video.id || index} className="bg-black h-80">
-          <VideoCard video={video} onPlay={onPlayVideo} />
-        </div>
-      ))}
+      {videos
+        .filter((video) => video.id)
+        .map((video) => (
+          <div key={video.id} className="bg-black h-80">
+            <VideoCard video={video} onPlay={onPlayVideo} />
+          </div>
+        ))}
     </div>
   );
 };
