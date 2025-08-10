@@ -50,6 +50,12 @@ export const MOCK_VIDEOS: Video[] = [
   },
   {
     id: '7',
+    title: 'Shrek Dancing Video Generated',
+    videoUrl: '/Shrek_Dancing_Video_Generated.mp4',
+    description: `A demo video featuring the beloved ogre Shrek in an entertaining dance sequence. This video serves as an example of AI-generated content and showcases the capabilities of the video generation system. Perfect for testing the gallery functionality and demonstrating the type of content that can be created and shared through the platform.`,
+  },
+  {
+    id: '7',
     title: 'Video Game Trailer: Sci-Fi Urban Chase',
     videoUrl: staticFilesUrl + 'Video_Game_Trailer_Sci_Fi_Urban_Chasemp4.mp4',
     description: `A fast-tracking POV shot through a grimy, neon-lit cyberpunk alleyway at night. Rain slicks the pavement, reflecting the glow of holographic advertisements. The sound of rapid, pounding footsteps and heavy breathing dominates the audio. Suddenly, the camera whips around to a lateral tracking shot following a nimble protagonist (a woman in a hooded jacket) as she leaps over discarded crates, pursued by two heavily armored security drones. Laser fire zaps past, accompanied by sharp "pew-pew" SFX and the whirring of the drones. High-energy, pulsating electronic music drives the action forward. She dives through a narrow opening; the camera follows seamlessly, ending with a shaky cam effect as she lands, panting.`,
