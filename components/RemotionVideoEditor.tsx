@@ -7,6 +7,7 @@ import { Player, PlayerRef } from '@remotion/player';
 import { parseMedia } from '@remotion/media-parser';
 import { Video } from '../types';
 import { VideoEditProps } from '../remotion/Root';
+import { AppleMusicTrendingSounds } from './AppleMusicTrendingSounds';
 
 interface RemotionVideoEditorProps {
   video: Video;
@@ -755,6 +756,16 @@ Created with Veo-3 Technology for HackMIT 2025
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Apple Music Trending Sounds */}
+          <div className="mb-8">
+            <AppleMusicTrendingSounds
+              onSelectSound={(sound) => {
+                console.log('Selected sound:', sound);
+                alert(`🎵 Selected: ${sound.name} by ${sound.artist}\n\nThis would merge the audio with your video!`);
+              }}
+            />
           </div>
 
           {/* Video Info */}

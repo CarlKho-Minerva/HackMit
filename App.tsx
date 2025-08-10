@@ -177,7 +177,8 @@ export const App: React.FC = () => {
     };
 
     setVideos((currentVideos) => [newVideo, ...currentVideos]);
-    setPlayingVideo(newVideo);
+    // Skip modal and go directly to Remotion editor
+    setEditingVideo(newVideo);
     setIsGenerating(false);
     setCurrentJob(null);
     setPromptText(""); // Clear the prompt for next generation
@@ -401,7 +402,7 @@ export const App: React.FC = () => {
                   : 'Upload & Publishing Interface'}
               </p>
 
-              {/* Test Remotion Editor Button */}
+              {/* Test Remotion Editor Button
               <div className="mb-8">
                 <button
                   onClick={() => handleStartEdit(MOCK_VIDEOS[0])}
@@ -410,7 +411,7 @@ export const App: React.FC = () => {
                   🎬 Test Video Editor
                 </button>
                 <span className="text-white/40 text-sm">Click to test Remotion editor with sample video</span>
-              </div>
+              </div> */}
 
               {/* Navigation */}
               <div className="flex justify-center gap-0">
