@@ -19,9 +19,9 @@ async function testCompleteFlow() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         videoUrl: testUrl,
-        title: 'HackMIT Demo Video - Veo-3 AI Generated',
-        description: 'This is a demo of our complete video upload and publishing pipeline for HackMIT!',
-        tags: ['HackMIT', 'AI', 'Veo-3', 'demo', 'generated-video'],
+        title: 'AI Video Demo - Veo-3 Generated',
+        description: 'This is a demo of our complete video upload and publishing pipeline!',
+        tags: ['AI', 'Veo-3', 'demo', 'generated-video'],
       }),
     });
 
@@ -41,7 +41,7 @@ async function testCompleteFlow() {
       console.log('  ✅ File Upload to GCS: Working');
       console.log('  ✅ YouTube Publishing: Working (Demo Mode)');
       console.log('  ✅ Frontend Interface: Ready');
-      console.log('\n🚀 Your HackMIT demo is ready to impress!');
+      console.log('\n🚀 Your demo is ready to impress!');
 
     } else {
       const error = await publishResponse.json();

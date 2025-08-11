@@ -24,7 +24,7 @@ async function testRealYouTube() {
     const formData = new FormData();
     const videoBuffer = fs.readFileSync(videoPath);
     const videoBlob = new Blob([videoBuffer], { type: 'video/mp4' });
-    formData.append('video', videoBlob, 'shrek-dancing-hackMIT-demo.mp4');
+    formData.append('video', videoBlob, 'shrek-dancing-ai-demo.mp4');
 
     const uploadResponse = await fetch(`${baseUrl}/api/upload-to-gcs`, {
       method: 'POST',
@@ -44,16 +44,26 @@ async function testRealYouTube() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         videoUrl: uploadData.url,
-        title: 'HackMIT 2025 Demo - AI Generated Video with Veo-3',
-        description: `This video was automatically generated using Google's Veo-3 AI model and uploaded through our custom pipeline built for HackMIT 2025!
+        title: 'AI Video Demo - Generated with Veo-3',
+        description: `This video was automatically generated using Google's Veo-3 AI model and uploaded through our custom pipeline!
 
-🤖 Generated with: Veo-3 AI
-🏗️ Built by: Carl Kho
-🏆 For: HackMIT 2025
-🔗 Upload Pipeline: Custom GCS + YouTube API integration
+📊 Technology Stack:
+• AI Generation: Google Veo-3
+• Video Processing: FFmpeg + Custom Pipeline
+• Cloud Storage: Google Cloud Storage
+• Publishing: YouTube Data API v3
 
-This demonstrates a complete end-to-end AI video generation and publishing system.`,
-        tags: ['HackMIT', 'AI', 'Veo-3', 'Google', 'machine-learning', 'video-generation', 'hackathon', 'demo'],
+🚀 Features:
+• Automated video generation
+• Professional editing workflow
+• Cloud-based processing
+• One-click publishing
+
+💡 Showcasing the future of AI-powered content creation!
+
+---
+#AI #VideoGeneration #Veo3 #Automation #ContentCreation`,
+        tags: ['AI', 'Veo-3', 'Google', 'machine-learning', 'video-generation', 'demo'],
       }),
     });
 
@@ -66,7 +76,7 @@ This demonstrates a complete end-to-end AI video generation and publishing syste
       console.log('📅 Upload Time:', publishData.uploadTime);
 
       console.log('\n✨ Click the link to see your video on YouTube! ✨');
-      console.log('\n🏆 Perfect for your HackMIT demo - you now have a real, working YouTube publishing pipeline!');
+      console.log('\n🏆 Perfect for your demo - you now have a real, working YouTube publishing pipeline!');
 
     } else {
       const error = await publishResponse.json();

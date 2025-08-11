@@ -463,7 +463,7 @@ export const App: React.FC = () => {
                   />
                 </section>
 
-                {/* Legacy Runpod Section - HIDDEN FOR HACKATHON */}
+                {/* Legacy Runpod Section - HIDDEN FOR DEMO */}
                 {false && (
                   <section className="mb-16 border border-white/20 bg-black p-8">
                     <div className="flex items-center justify-between mb-8">
@@ -635,7 +635,7 @@ export const App: React.FC = () => {
         />
       )}
 
-      {/* RunPod Trending Sounds Modal - HIDDEN FOR HACKATHON */}
+      {/* RunPod Trending Sounds Modal - HIDDEN FOR DEMO */}
       {false && (
         <TrendingSoundsModal
           isOpen={showRpTrendingModal}

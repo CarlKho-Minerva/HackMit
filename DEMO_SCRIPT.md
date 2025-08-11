@@ -1,7 +1,7 @@
-# Viral-Veo: Explainer Demo Script for FAF Multimodal Hackathon
+# Viral-Veo: Explainer Demo Script
 
 ## Pre-Demo Setup (Screen Share Ready)
-- **Tab 1**: Your hackathon intro video (ready to play)
+- **Tab 1**: Your intro video (ready to play)
 - **Tab 2**: App home screen with video gallery visible
 - **Tab 3**: Remotion editor with pre-loaded video
 - **Tab 4**: YouTube channel showing your published videos
@@ -11,7 +11,7 @@
 ---
 
 ## HOOK: The Video That Proves Everything (0:00 - 0:20)
-**[PLAY your Veo-3 hackathon video immediately - let it run 10 seconds]**
+**[PLAY your Veo-3 intro video immediately - let it run 10 seconds]**
 
 **[Switch to camera/yourself]**
 
@@ -73,7 +73,7 @@
 ## Explainer Demo Instructions (No Live Editing!)
 
 ### Screen Share Flow
-1. **Start with video playing** (Tab 1 - your hackathon intro)
+1. **Start with video playing** (Tab 1 - your intro)
 2. **Switch to app gallery** (Tab 2 - show existing videos)
 3. **Click into editor** (Tab 3 - pre-loaded video in Remotion)
 4. **Show publishing modal** (same tab - click YouTube button)

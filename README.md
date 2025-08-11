@@ -152,7 +152,7 @@ veo-3-gallery/
 
 ## �🚀 Demo Features
 
-This HackMIT project demonstrates:
+This project demonstrates:
 
 - **Real Cloud Integration** - Google Cloud Storage with proper authentication
 - **AI Model Integration** - Google Veo-3 for video generation
@@ -181,4 +181,4 @@ This HackMIT project demonstrates:
 
 ---
 
-Built with ❤️ for HackMIT 2025 - Showcasing the future of AI-powered video creation
+Built with ❤️ - Showcasing the future of AI-powered video creation

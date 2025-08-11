@@ -108,7 +108,7 @@ Publishes a video to YouTube with comprehensive metadata control.
 ```json
 {
   "videoUrl": "https://storage.googleapis.com/bucket/videos/uuid.mp4",
-  "title": "AI Generated Video - HackMIT Demo",
+  "title": "AI Generated Video - Demo",
   "description": "Professional AI-generated video with captions...",
   "tags": ["AI", "Video", "Content", "VEO3"],
   "privacy": "public",
@@ -122,7 +122,7 @@ Publishes a video to YouTube with comprehensive metadata control.
   "success": true,
   "videoId": "dQw4w9WgXcQ",
   "url": "https://youtube.com/watch?v=dQw4w9WgXcQ",
-  "title": "AI Generated Video - HackMIT Demo",
+  "title": "AI Generated Video - Demo",
   "uploadedAt": "2025-08-10T12:00:00.000Z"
 }
 ```

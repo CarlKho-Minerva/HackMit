@@ -4,7 +4,7 @@
 
 ---
 
-**Demo Expert**: "Carl, I've watched a thousand hackathon demos. Your biggest mistake is starting with technical explanations. Lead with EMOTION. That viral video you made? Play it, let it breathe, then say 'I built the platform that made this.' Don't explain how - show the outcome first."
+**Demo Expert**: "Carl, I've watched a thousand demos. Your biggest mistake is starting with technical explanations. Lead with EMOTION. That viral video you made? Play it, let it breathe, then say 'I built the platform that made this.' Don't explain how - show the outcome first."
 
 **Carl**: "But shouldn't I explain the technical complexity?"
 

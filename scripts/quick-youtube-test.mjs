@@ -16,16 +16,25 @@ async function testYouTubeUpload() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         videoUrl: 'https://storage.googleapis.com/veo-3-gallery-hack-mit-468523/videos/832dca4c-55ea-4457-a19f-81a721e80acd.mp4',
-        title: 'HackMIT Demo - AI Video with Veo-3',
-        description: `🎬 AI Generated Video Demo for HackMIT 2025
+        title: 'AI Video Demo - Created with Veo-3',
+        description: `🎬 AI Generated Video Demo
 
-🤖 Generated with: Veo-3 AI
-🏗️ Built by: Carl Kho
-🏆 For: HackMIT 2025
-🔗 Pipeline: GCS + YouTube API
+📊 Technology Showcase:
+• Video Generation: Google Veo-3 AI Model
+• Processing: Professional editing pipeline
+• Publishing: Automated YouTube integration
 
-Complete end-to-end AI video generation and publishing system.`,
-        tags: ['HackMIT', 'AI', 'Veo-3', 'demo', 'video-generation'],
+🚀 Features:
+• AI-Enhanced video generation
+• Professional editing tools
+• Multi-platform optimization
+• One-click publishing workflow
+
+💡 Demonstrating the future of content creation!
+
+---
+#AI #VideoGeneration #Veo3 #ContentCreation #Automation`,
+        tags: ['AI', 'Veo-3', 'demo', 'video-generation'],
       }),
     });
 

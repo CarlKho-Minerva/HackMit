@@ -1,4 +1,4 @@
-# Judges Roundtable: Evaluating Viral-Veo for FAF Multimodal Hackathon
+# Judges Roundtable: Evaluating Viral-Veo
 
 **Participants**: Technical Judge (Ex-Google AI), Business Judge (VC), Academic Judge (Stanford AI Lab)
 
